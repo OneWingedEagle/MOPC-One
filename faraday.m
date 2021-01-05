@@ -2,7 +2,8 @@ function faraday
 
 clear all
 
-colors = {'-or', '-ob', '-oc', '-ok','-*r', '-*b', '-*c', '-*k','-xr', '-xb', '-xc', '-xk'};
+colors = {'-or', '-ob', '-oc', '-ok','-*r', '-*b',...
+ '-*c', '-*k','-xr', '-xb', '-xc', '-xk'};
 %C = {'k','b','r','g','y'}; % Cell array of colros.
 
 
@@ -118,8 +119,6 @@ else
 colR=colors{2};
 end
 
-
-
 line=getNewDataLine(fid);
 numbs = str2num(line);
 
@@ -137,8 +136,6 @@ numbs = str2num(line);
 plotFT=numbs(1);
 plotWave=numbs(2);
 
-
-
 %=================
 
 t1=cputime;
@@ -152,13 +149,15 @@ Fr_hom=zeros(1*cf*ndiv+1,1);
 for p=1:1*cf*ndiv+1
     
     p
-    
-
-    
+       
     Fn(p)=wn1+dwn*(p-1);
-    k1=sqrt(eps1)*2*pi*Fn(p)/ay;
-     Fr_hom(p)=-180*gamab/sqrt(epsbx)*Na*Fn(p);
-     wvlen=ay/Fn(p);
+%   wvlen=Fn(p);
+%   wn=ay/wvlen;
+    wn=Fn(p);
+    k1=sqrt(eps1)*2*pi*wn/ay;
+     Fr_hom(p)=-180*gamab/sqrt(epsbx)*Na*wn;
+ %    wvlen=ay/Fn(p);
+  %   wvlen
     [Ts Rs,Fr]=calculteFaraday(geometry,epsa,epsb,eps1,eps3,ax,ay,Rx,Ry,d1,d2,Na,nGx,nGy,k1,p,plotFT,plotWave,colR,theta,fi,rec);
            
       if(real(Ts)>1) 
@@ -169,7 +168,6 @@ for p=1:1*cf*ndiv+1
     Tt(p)=real(Ts);
     
     uu=Ts+Rs;
-    uu
 
 end
 
@@ -375,9 +373,6 @@ if(p==1)
                 
                 kxn2=kxn1^2;
                
-                tempT=zeros(nk,nk);
-                tempR=zeros(nk,nk);
-                tempE=zeros(nk,nk);
                 
                 for Gy1=1:nGy
                     kym=Gy1*by;
@@ -396,57 +391,42 @@ if(p==1)
                     KapTensd=[Kapad(1) 0 1i*Kapad(4); 0 Kapad(2) 0 ;
                         -1i*Kapad(4) 0  Kapad(3)];
                     
-                    Akg=zeros(3,3);             
+                    W=zeros(3,3);             
                     
-                    Akg(1,1)=kym^2;
-                    Akg(1,2)=-kxn1*kym;
-                    Akg(2,1)= Akg(1,2);
-                    Akg(2,2)=kxn2;
+                    W(1,1)=kym^2;
+                    W(1,2)=-kxn1*kym;
+                    W(2,1)= W(1,2);
+                    W(2,2)=kxn2;
                     
-                    Akg(3,3)=Akg(1,1)+ Akg(2,2);
+                    W(3,3)=W(1,1)+ W(2,2);
 
-                    AkdKap=(KapTenss*Akg-KapTensd*conj(Akg));
+                     Wm=W; 
+                    Wm(1,2)=-W(1,2);
+                    Wm(2,1)=Wm(1,2);
                     
-                    Akg1=zeros(3,3);
+                    CA=(KapTenss*W-KapTensd*Wm);
+                   
+                    
+                    WR=zeros(3,3);
+                    WR(2,2)=kxn2*pph/Gy1;
+                    WR(3,3)=WR(2,2);
+                    
+                    
+                   CR=1*(KapTenss+KapTensd)*WR;
 
-                    
-                    if(mod(Gy1,2)==0)
-                        Akg1(2,2)=kxn2*pph/Gy1;
+
+                    if(mod(Gy1,2)==1)
+                      CT= CR;
                     else
-                        Akg1(2,2)=-kxn2*pph/Gy1;
+                      CT= -CR;
                     end
-                    
-                    
-                    Akg1(3,3)=Akg1(2,2);
-                    
-                    
-                    dKapTens1=-1*(KapTenss*Akg1-KapTensd*conj(Akg1));
-                    
-              
-                    tempT=tempT+dKapTens1;
 
-                    
-                   Akg2=zeros(3,3);
-
-                    Akg2(2,2)=kxn2*pph/Gy1;
-                   Akg2(3,3)=Akg2(2,2);
-
-
-                   dKapTens2=-1*(KapTenss*Akg2-KapTensd*conj(Akg2));
-           
-                    
-                   tempR=tempR-dKapTens2;
-                    
-                    if(Gx1==0)
-                        
-                       tempE=tempE-dKapTens2;
-                    end
                     
                     r1=(countG-1)*nk;
                     c1=(countG1-1)*nk;
                     for j=1:nk
                         for k=1:nk
-                            MM(r1+j,c1+k)= AkdKap(j,k);
+                            MM(r1+j,c1+k)= CA(j,k);
                             
                         end
                     end
@@ -457,7 +437,7 @@ if(p==1)
                 
                 
                 if(Gx1==0)
-                    v=tempE*E0;
+                    v=CR*E0;
                     for k=1:nk
                         bE((countG-1)*nk+k)=v(k);
                     end
@@ -467,41 +447,40 @@ if(p==1)
                 
                 for j=1:nk
                     for k=1:nk
-                        
-                        MM((countG-1)*nk+j,(numG+Gx1p-1)*nk+k)=tempT(j,k);
-                        MM((countG-1)*nk+j,(numG+dd+Gx1p-1)*nk+k)=tempR(j,k);
-                        
+                      
+                      MM((countG-1)*nk+j,(numG+Gx1p-1)*nk+k)=-CT(j,k);
+                      MM((countG-1)*nk+j,(numG+dd+Gx1p-1)*nk+k)=-CR(j,k);
+                      
                     end
                 end
                 
-                
-                
-                if(Gx==Gx1)
-                    for k=1:nk
-                        if(k~=2)
-                            
-                            MM((Gx1p+numG-1)*nk+k,((Gx1p-1)*nGy+Gy-1)*nk+k)=pi*Gy;
-                        end
-                    end
+        
+            if(Gx==Gx1)
+              for k=1:nk
+                if(k~=2)
                     
-                    if(mod(Gy,2)==0)
-                        for k=1:nk
-                            if(k~=2)
-                                MM((Gx1pp+numG-1)*nk+k,((Gx1p-1)*nGy+Gy-1)*nk+k)=pi*Gy;
-                            end
-                        end
-                    else
-                        for k=1:nk
-                            if(k~=2)
-                                MM((Gx1pp+numG-1)*nk+k,((Gx1p-1)*nGy+Gy-1)*nk+k)=-pi*Gy;
-                            end
-                        end
-                    end
-                    
+                    MM((Gx1p+numG-1)*nk+k,((Gx1p-1)*nGy+Gy-1)*nk+k)=pi*Gy;
                 end
-                
-            end
+              end
+              
+              if(mod(Gy,2)==0)
+                for k=1:nk
+                    if(k~=2)
+                        MM((Gx1pp+numG-1)*nk+k,((Gx1p-1)*nGy+Gy-1)*nk+k)=pi*Gy;
+                    end
+                end
+              else
+                for k=1:nk
+                    if(k~=2)
+                        MM((Gx1pp+numG-1)*nk+k,((Gx1p-1)*nGy+Gy-1)*nk+k)=-pi*Gy;
+                    end
+                end
+              end
+              
+          end
             
+        end
+        
             
         end
         
@@ -690,9 +669,6 @@ for Gx=-nGx:nGx
     
 
 end
-
-Tn2
-Rn2
 
 Ts=0;
 Rs=0;
@@ -975,24 +951,24 @@ for dGx=-2*nGx:2*nGx
         
         if(dGx==0&& dGy==0)
             for k=1:nk
-                  KapaUnit(dGxp,dGyp,k)=(invepsb(k)+ff*(invepsa(k)-invepsb(k)))/(2*Na);
-                  
+           KapaUnit(dGxp,dGyp,k)=(invepsb(k)+ff*(invepsa(k)-invepsb(k)))/(2*Na);
+                
             end
             
-         else
-        tt=ff*besselj(1,GnmR)/GnmR;
+       else
+      tt=ff*besselj(1,GnmR)/GnmR;
 
-            factb=0;
-             if(dGx==0)
-            ttb=dGy*by*a2/2;
-            factb=a2/(2*L)*sin(ttb)/(ttb);
-            end
-            
-            for k=1:nk
-                    KapaUnit(dGxp,dGyp,k)= factb*invepsb(k)+tt*(invepsa(k)-invepsb(k))/(Na);;
-            end
-            
-            
+          factb=0;
+           if(dGx==0)
+          ttb=dGy*by*a2/2;
+          factb=a2/(2*L)*sin(ttb)/(ttb);
+          end
+        
+      for k=1:nk
+       KapaUnit(dGxp,dGyp,k)= factb*invepsb(k)+tt*(invepsa(k)-invepsb(k))/(Na);
+       end
+        
+          
         end
         
         
@@ -1177,11 +1153,13 @@ for dGx=-2*nGx:2*nGx
         dGyp=dGy+1+2*nGy;
         
         if(dGx==0&& dGy==0)
-            for k=1:nk
-                if(k~=4)
-                    Kapa(dGxp,dGyp,k)=1*(ff*invepsa(k)+(1-ff)*invepsb(k))+2*d11*(invepsa(k)-invepsb(k));
-                end
-                
+          for k=1:nk
+              if(k~=4)
+             Kapa(dGxp,dGyp,k)=1*(ff*invepsa(k)+(1-ff)*invepsb(k))+...
+             2*d11*(invepsa(k)-invepsb(k));
+          
+          end
+              
             end
             
         elseif(dGy==0)
@@ -1207,7 +1185,7 @@ for dGx=-2*nGx:2*nGx
                         vvL=2*sin(dGy*pi*.5*(L-2*d1)/L)/(dGy*pi);
                         factm=-1i*sin(dGy*pi*.5);
                         
-                        Kapa(dGxp,dGyp,k)=Kapa(dGxp,dGyp,k)+factm*vvL*invepsb(k);
+                       Kapa(dGxp,dGyp,k)=Kapa(dGxp,dGyp,k)+factm*vvL*invepsb(k);
                     end
                 else
                     factm=cos(dGy*pi/2)*sin(Na*tt)/sin(tt)/Na;
@@ -1220,8 +1198,8 @@ for dGx=-2*nGx:2*nGx
                 if(dGx==0 && d11>0 && k~=4)
                     aa= pi*dGy*d11;
                     
-                    zz=1*sin(aa)/aa*d11+2*cos(pi*dGy*(L-d1/2)/L)*sin(aa/2)/aa*d11;
-                    Kapa(dGxp,dGyp,k)= Kapa(dGxp,dGyp,k)+zz*(invepsa(k)-invepsb(k));
+               zz=1*sin(aa)/aa*d11+2*cos(pi*dGy*(L-d1/2)/L)*sin(aa/2)/aa*d11;
+               Kapa(dGxp,dGyp,k)= Kapa(dGxp,dGyp,k)+zz*(invepsa(k)-invepsb(k));
                 end
                 
             end
@@ -1434,7 +1412,8 @@ for dGx=-2*nGx:2*nGx
         
         if(dGx==0&& dGy==0)
             for k=1:nk
-                    Kapa(dGxp,dGyp,k)=1*(ff*invepsa(k)+(1-ff)*invepsb(k))+2*d11*(invepsa(k)-invepsb(k));
+           Kapa(dGxp,dGyp,k)=1*(ff*invepsa(k)+(1-ff)*invepsb(k))+...
+           2*d11*(invepsa(k)-invepsb(k));
                 
             end
             
@@ -1460,8 +1439,8 @@ for dGx=-2*nGx:2*nGx
                 if(dGx==0 && d11>0 )
                     aa= pi*dGy*d11;
                     
-                    zz=1*sin(aa)/aa*d11+2*cos(pi*dGy*(L-d1/2)/L)*sin(aa/2)/aa*d11;
-                    Kapa(dGxp,dGyp,k)= Kapa(dGxp,dGyp,k)+zz*(invepsa(k)-invepsb(k));
+               zz=1*sin(aa)/aa*d11+2*cos(pi*dGy*(L-d1/2)/L)*sin(aa/2)/aa*d11;
+               Kapa(dGxp,dGyp,k)= Kapa(dGxp,dGyp,k)+zz*(invepsa(k)-invepsb(k));
                 end
                 
             end
@@ -1491,29 +1470,7 @@ end
 
 
 function [h]=arrow3d(x,y,z,head_frac,radii,radii2,colr)
-%
-% The function plotting 3-dimensional arrow
-%
-% h=arrow3d(x,y,z,head_frac,radii,radii2,colr)
-%
-% The inputs are:
-%       x,y,z =  vectors of the starting point and the ending point of the
-%           arrow, e.g.:  x=[x_start, x_end]; y=[y_start, y_end];z=[z_start,z_end];
-%       head_frac = fraction of the arrow length where the head should  start
-%       radii = radius of the arrow
-%       radii2 = radius of the arrow head (defult = radii*2)
-%       colr =   color of the arrow, can be string of the color name, or RGB vector  (default='blue')
-%
-% The output is the handle of the surfaceplot graphics object.
-% The settings of the plot can changed using: set(h, 'PropertyName', PropertyValue)
-%
-% example #1:
-%        arrow3d([0 0],[0 0],[0 6],.5,3,4,[1 0 .5]);
-% example #2:
-%        arrow3d([2 0],[5 0],[0 -6],.2,3,5,'r');
-% example #3:
-%        h = arrow3d([1 0],[0 1],[-2 3],.8,3);
-%        set(h,'facecolor',[1 0 0])
+
 %
 % Written by Moshe Lindner , Bar-Ilan University, Israel.
 % July 2010 (C)
@@ -1557,7 +1514,8 @@ P1=n1+Pc;
 X1=[];Y1=[];Z1=[];
 j=1;
 for theta=([0:N])*2*pi./(N);
-    R1=Pc+radii*cos(theta).*(P1-Pc) + radii*sin(theta).*cross(dr,(P1-Pc)) -origin_shift;
+    R1=Pc+radii*cos(theta).*(P1-Pc) +...
+    radii*sin(theta).*cross(dr,(P1-Pc)) -origin_shift;
     X1(2:3,j)=R1(:,1);
     Y1(2:3,j)=R1(:,2);
     Z1(2:3,j)=R1(:,3);
@@ -1583,7 +1541,8 @@ P1=n1+Pc;
 
 j=1;
 for theta=([0:N])*2*pi./(N);
-    R1=Pc+radii2*cos(theta).*(P1-Pc) + radii2*sin(theta).*cross(dr,(P1-Pc)) -origin_shift;
+    R1=Pc+radii2*cos(theta).*(P1-Pc) +...
+    radii2*sin(theta).*cross(dr,(P1-Pc)) -origin_shift;
     X1(4:5,j)=R1(:,1);
     Y1(4:5,j)=R1(:,2);
     Z1(4:5,j)=R1(:,3);
@@ -1709,11 +1668,11 @@ for dGx=-2*nGx:2*nGx
                 x=xSet(nx);
                 y=ySet(ny);
                 tt=dGx*bx*x+dGy*by*y;
-                
-                for k=1:nk
-                    KapaUnit(dGxp,dGyp,k)=KapaUnit(dGxp,dGyp,k)+inveps(nx,ny,k)*exp(-1i*(tt));
-                end
+           
+            for k=1:nk
+      KapaUnit(dGxp,dGyp,k)=KapaUnit(dGxp,dGyp,k)+inveps(nx,ny,k)*exp(-1i*(tt));
             end
+          end
         end
         
         
