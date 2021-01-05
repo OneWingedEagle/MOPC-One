@@ -1,4 +1,4 @@
-function faraday
+function faradayX
 
 clear all
 
@@ -158,18 +158,17 @@ for p=1:1*cf*ndiv+1
     Fn(p)=wn1+dwn*(p-1);
     k1=sqrt(eps1)*2*pi*Fn(p)/ay;
      Fr_hom(p)=-180*gamab/sqrt(epsbx)*Na*Fn(p);
-     wvlen=ay/Fn(p);
+    
     [Ts Rs,Fr]=calculteFaraday(geometry,epsa,epsb,eps1,eps3,ax,ay,Rx,Ry,d1,d2,Na,nGx,nGy,k1,p,plotFT,plotWave,colR,theta,fi,rec);
            
       if(real(Ts)>1) 
-      %  Ts=1;
+        Ts=1;
       end
       
     Tr(p)=real(Fr);
     Tt(p)=real(Ts);
     
     uu=Ts+Rs;
-    uu
 
 end
 
@@ -280,7 +279,9 @@ by=pi/L;
 
 pph=2/pi;
 
-dimx=nk*(numG+2*(Lx1));
+    dimx=nk*(numG+2*(Lx1));
+
+
 
 if(p==1)
     disp('Computing Fourier series ..');
@@ -288,20 +289,22 @@ if(p==1)
     if(triang)
         FillKapaTriang(nGx,nGy,epsa,epsb,L,R,Na,a1,a2);  %triangular
         %lattivce not implemented properly.
-    elseif (geometry==0)
-        FillKapaCylinderAntiSymDef(nGx,nGy,epsa,epsb,L,Rx,Ry,Na,a1,a2,d1,fi); 
+    elseif (geometry==0 && Rx==Ry)
+        FillKapaCylinderAntiSymDef(nGx,nGy,epsa,epsb,L,Rx,Na,a1,a2,d1); 
 
     else
     if(geometry==1 && rec==1)
     FillKapaRectangleAntiSym(nGx,nGy,epsa,epsb,L,Rx,Ry,Na,a1,a2,d1,fi);
 
   else
+
        FillKapaAntiSymNum(geometry,nGx,nGy,epsa,epsb,L,Rx,Ry,Na,a1,a2,d1,fi);
  end
  end
 
- 
-   if(plotFT)
+
+    
+    if(plotFT)
         
         
         ndx=30;
@@ -349,16 +352,20 @@ if(p==1)
 %        return;
     end
 
+
     disp('Computing matrix, step 1...');
     
     dimx=nk*(numG+2*(Lx1));
    
     MM=  single(zeros(dimx,dimx));
+    
+
         
     bE=zeros(nk*(numG+2*(Lx1)),1);
     
     countG=0;
-       
+    
+    
     for Gx=-nGx:nGx
         for Gy=1:nGy
             
@@ -370,11 +377,15 @@ if(p==1)
                 dGxp=Lx1+Gx-Gx1;
                 Gx1p=nGx+1+Gx1;
                 Gx1pp=Lx2+Gx1;
-              
-                kxn1=1*kx+Gx1*bx;
+
+
+                
+                kxn1=kx+Gx1*bx;
+               % kxn1=0;
                 
                 kxn2=kxn1^2;
-               
+             %    kxn2=1;
+                
                 tempT=zeros(nk,nk);
                 tempR=zeros(nk,nk);
                 tempE=zeros(nk,nk);
@@ -384,9 +395,12 @@ if(p==1)
                     dGyp=Ly1+(Gy-Gy1);
                     sGyp=Ly1+Gy+Gy1;
                     countG1=countG1+1;
-                                   
+                         
+       
+                    
                     Kapas(1:4)=Kapa(dGxp,sGyp,1:4);
-                                              
+      
+                                        
                     Kapad(1:4)=Kapa(dGxp,dGyp,1:4);
                     
                     KapTenss=[Kapas(1) 0 1i*Kapas(4); 0 Kapas(2) 0 ;
@@ -395,8 +409,10 @@ if(p==1)
                     
                     KapTensd=[Kapad(1) 0 1i*Kapad(4); 0 Kapad(2) 0 ;
                         -1i*Kapad(4) 0  Kapad(3)];
+
                     
-                    Akg=zeros(3,3);             
+                    Akg=zeros(3,3);
+                    
                     
                     Akg(1,1)=kym^2;
                     Akg(1,2)=-kxn1*kym;
@@ -408,7 +424,14 @@ if(p==1)
                     AkdKap=(KapTenss*Akg-KapTensd*conj(Akg));
                     
                     Akg1=zeros(3,3);
-
+                    
+##                    if(mod(Gy1,2)==0)
+##                        Akg1(1,2)=kxn1*pph/Gy1;
+##                    else
+##                        Akg1(1,2)=-kxn1*pph/Gy1;
+##                    end
+##                    
+##                    Akg1(2,1)=Akg1(1,2);
                     
                     if(mod(Gy1,2)==0)
                         Akg1(2,2)=kxn2*pph/Gy1;
@@ -427,7 +450,10 @@ if(p==1)
 
                     
                    Akg2=zeros(3,3);
-
+##                    
+##                    Akg2(1,2)=-kxn1*pph/Gy1;
+##         
+##                    Akg2(2,1)=Akg2(1,2);
                     Akg2(2,2)=kxn2*pph/Gy1;
                    Akg2(3,3)=Akg2(2,2);
 
@@ -568,7 +594,7 @@ for Gx=-nGx:nGx
     Gxp=nGx+1+Gx;
     Gxpp=Lx2+Gx;
     
-    kxn1=1*kx+Gx*bx;
+    kxn1=kx+Gx*bx;
     kxn2=kxn1^2;
     
     
@@ -626,7 +652,9 @@ disp('solving matrix...');
 
   NN=NN+MM;   
 
+
   x=linsolve(NN,bN);
+
 
 Anm=zeros(2*nGx+1,nGy,nk);
 Tn=zeros(2*nGx+1,nk);
@@ -691,15 +719,12 @@ for Gx=-nGx:nGx
 
 end
 
-Tn2
-Rn2
-
 Ts=0;
 Rs=0;
 
 for Gx=-nGx:nGx
     k=nGx+1+Gx;
-    kxn1=1*kx+Gx*bx;
+    kxn1=kx+Gx*bx;
     kxn2=kxn1^2;
     
     if(k1>=abs(kxn1))
@@ -715,16 +740,12 @@ for Gx=-nGx:nGx
         ktny=1i*sqrt(kxn2-k3^2);
     end
         
-    %     Ts=Ts+Tn2(k);%/cosd(theta);
     Ts=Ts+ktny/k3*sqrt(eps3/eps1)*Tn2(k)/cosd(theta);
         %Ts=Ts+ktny/k3*sqrt(eps3/eps1)*abs(Tn(k,3))^2/cos(thetad);
 
     
     Rs=Rs+abs(krny)/k1*Rn2(k)/cosd(theta);
 end
-
-%E02=(1+Rn(nGx+1))*conj(1+Rn(nGx+1));
-%Ts=Tn2(nGx+1)/E02;
 
 Fr=0;
 
@@ -755,7 +776,7 @@ for ix=1:Nx
         
         for Gx=-nGx:nGx
             
-            kxn=1*kx+Gx*bx;
+            kxn=Gx*bx;
             
             Gxp=nGx+1+Gx;
             if(Gx==0)
@@ -930,7 +951,7 @@ end
 
 end
 
-function FillKapaCylinderAntiSymDef(nGx,nGy,epsa,epsb,L,Rx,Ry,Na,a1,a2,d1,fi)
+function FillKapaCylinderAntiSymDef(nGx,nGy,epsa,epsb,L,R,Na,a1,a2,d1)
 global Kapa;
 
 disp('anti-sym Defect');
@@ -953,23 +974,19 @@ invepsb=[invepsb1(1,1) invepsb1(2,2) invepsb1(3,3)  imag(invepsb1(1,3))];
 
 end
 
-ff=pi*Rx*Ry/(a1*a2);
+ff=pi*R*R/(a1*a2);
 by=pi/L;
 bx=2*pi/a1;
 
-rotMat=[cosd(fi) sind(fi);-sind(fi) cosd(fi)];
-
 KapaUnit=zeros(4*nGx+1,4*nGy+1,4)+1i*zeros(4*nGx+1,4*nGy+1,4);
+
 
 for dGx=-2*nGx:2*nGx
     Gn=bx*dGx;
       dGxp=dGx+1+2*nGx;
     for dGy=-2*nGy:2*nGy
         Gm=by*dGy;
-        Gnm=[Gn Gm]';
-			Gnmr=rotMat*Gnm;
-        
-        GnmR=sqrt((Gnmr(1)*Rx)^2+(Gnmr(2)*Ry)^2);
+        GnmR=sqrt(Gn*Gn+Gm*Gm)*R;
         
         dGyp=dGy+1+2*nGy;
         
@@ -1291,7 +1308,7 @@ for dGx=-2*nGx:2*nGx
          if(dGy==0)
        four_coefy= (invepsb(k)+filly*(invepsa(k)-invepsb(k)))/(2*Na);
         else
-          four_coefy=(invepsa(k)-invepsb(k))*2*Ry/(a1)*sin(tty)/(tty)/(2*Na);
+          four_coefy=2*(invepsa(k)-invepsb(k))*2*Ry/(a1)*sin(tty)/(tty)/(2*Na);
        end
       
        
@@ -1803,6 +1820,7 @@ for n=-Na:Na-1
 
 end
 
+d1
 
 if(d1>0)
  KappaEnds=zeros(1,4*nGy+1,4)+1i*zeros(1,4*nGy+1,4);
