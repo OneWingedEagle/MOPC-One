@@ -6,7 +6,7 @@
 //GEOMETRY =0 indicates eliptical, GEOMETRY =1 is for rectangular
 //GEOMETRY 
 0     
-0.5  0.5 .0
+0.082e-6  0.082e-6 .02e-6
 //0.05e-6  .09e-6 0.0e-6
 //Rx Ry
 //fi  anticlockiwise angle of elipse axis with x-axis.  angle is given in degrees.
@@ -31,11 +31,11 @@
 1 	1.	1. 	0.0
 //2.1316  2.1316 2.1316 0.0
 //N bars *  num defects * start def
-10
+14
 //Transmittivity  FaradayRotation
-2 0
+1 0
 // WN1	WN2 DIVISION
-0.3 .6 30
+0.45 .75 360
 0 1
 //PlotFouriesSeries   Plot3DVectors
 0 0

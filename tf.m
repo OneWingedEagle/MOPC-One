@@ -165,9 +165,9 @@ for p=1:1*cf*ndiv+1
     %p
     
      Fn(p)=wn1+dwn*(p-1);
-  %  wvlen=Fn(p)*1e-6;
+    wvlen=Fn(p)*1e-6;
    %  wvlen= d*Fn(p)
-     wvlen=d/Fn(p);
+  %   wvlen=d/Fn(p);
     % wvlen
    % Fn(p)=wn1+dwn*(p-1);
    % k1=sqrt(eps1)*2*pi*Fn(p)/ay;
@@ -305,12 +305,15 @@ nAg=sqrt(em);
  
  n1=sqrt(e1);
  n2=sqrt(e2);
+ 
+ n1=2.17;
+ n2=1.49;
 
  %nAg=.01+3i;
  nAg=.5;%.9+.02i;
  n3=nAg;
  p0=cosd(theta)/n0;
- method=0;
+ method=2;
  
 if(method==0)
 
@@ -354,19 +357,36 @@ M3(1,2)=-i*sin(beta3)/p3;
 M3(2,1)=-i*sin(beta3)*p3;
 M3(2,2)=M3(1,1);
 
-  ML=M1*M2*M3;
-  MU=M3*M2*M1;
+  ML=M1*M2;
+  MU=M2*M1;
 
    MML=ML;
    MMU=MU;
 
-  for n=2:Na
+  for n=2:Na/2
     MML=MML*ML;
     MMU=MMU*MU;
   end
   %MM=MML*MMU;
   
-  MM=MMU;
+   nf=n1;
+ df=d3;
+   betaf=2*pi*nf*df*cosd(theta)/lam;
+ if(TE==0)
+  pf=cosd(theta)/nf;
+else
+  pf=cosd(theta)*nf;
+end
+
+  Mf=zeros(2,2);
+Mf(1,1)=cos(betaf);
+Mf(1,2)=-i*sin(betaf)/pf;
+Mf(2,1)=-i*sin(betaf)*pf;
+Mf(2,2)=Mf(1,1);
+
+MM=MML*Mf*MMU;
+  
+ % MM=MMU;
 
   m11=MM(1,1);
   m12=MM(1,2);
@@ -423,13 +443,29 @@ elseif(method==1)
    MML=ML;
    MMU=MU;
 
-  for n=2:Na
+  for n=2:Na/2
     MML=MML*ML;
     MMU=MMU*MU;
   end
-  %MM=MML*MMU;
   
-  MM=MMU;
+  %MM=MML*MMU;
+ nf=n1;
+ df=d3;
+   betaf=2*pi*nf*df*cosd(theta)/lam;
+ if(TE==0)
+  pf=cosd(theta)/nf;
+else
+  pf=cosd(theta)*nf;
+end
+
+  Mf=zeros(2,2);
+Mf(1,1)=cos(betaf);
+Mf(1,2)=-i*sin(betaf)/pf;
+Mf(2,1)=-i*sin(betaf)*pf;
+Mf(2,2)=Mf(1,1);
+
+MM=MML*Mf*MMU;
+ % MM=MMU;
   
 
    %%%%%%%%%%%
@@ -502,13 +538,29 @@ kz1=2*pi*n1*cosd(theta)/lam;
    MML=ML;
    MMU=MU;
 
-  for n=2:Na
+  for n=2:Na/2
     MML=MML*ML;
     MMU=MMU*MU;
   end
   %MM=MML*MMU;
+  n3=n1;
+   %%%%%%%%%%% defect layer
+   kz3=2*pi*n3*cosd(theta)/lam;
+  phi3=kz3*d3;
+
+   P3=zeros(2,2);
+   P3(1,1)=exp(1i*phi3);
+   P3(2,2)=exp(-1i*phi3);
   
-  MM=MMU;
+  D3=zeros(2,2);
+   D3(1,1)=1;
+     D3(1,2)=1;
+   D3(2,1)=-kz3;
+    D3(2,2)=kz3;
+    
+    M3=D3*P3*inv(D3);
+  
+  MM=MML*M3*MMU;
    %%%%%%%%%%%
   kz0=2*pi*n0*cosd(theta)/lam;  
     D0=zeros(2,2);
