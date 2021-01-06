@@ -373,15 +373,21 @@ if(p==1)
                 
                 kxn2=kxn1^2;
                
+                tempT=zeros(nk,nk);
+                tempR=zeros(nk,nk);
+                tempE=zeros(nk,nk);
                 
                 for Gy1=1:nGy
                     kym=Gy1*by;
                     dGyp=Ly1+(Gy-Gy1);
                     sGyp=Ly1+Gy+Gy1;
                     countG1=countG1+1;
-                                   
+                         
+       
+                    
                     Kapas(1:4)=Kapa(dGxp,sGyp,1:4);
-                                              
+      
+                                        
                     Kapad(1:4)=Kapa(dGxp,dGyp,1:4);
                     
                     KapTenss=[Kapas(1) 0 1i*Kapas(4); 0 Kapas(2) 0 ;
@@ -390,8 +396,10 @@ if(p==1)
                     
                     KapTensd=[Kapad(1) 0 1i*Kapad(4); 0 Kapad(2) 0 ;
                         -1i*Kapad(4) 0  Kapad(3)];
+
                     
-                    W=zeros(3,3);             
+                    W=zeros(3,3);
+                    
                     
                     W(1,1)=kym^2;
                     W(1,2)=-kxn1*kym;
@@ -399,34 +407,52 @@ if(p==1)
                     W(2,2)=kxn2;
                     
                     W(3,3)=W(1,1)+ W(2,2);
+                    
+                    Wm=W;
+                     Wm(1,2)= -W(1,2);
+                     Wm(2,2)= -W(2,1);
 
-                     Wm=W; 
-                    Wm(1,2)=-W(1,2);
-                    Wm(2,1)=Wm(1,2);
+                    CA=(KapTensd*W-KapTenss*Wm);
                     
-                    CA=(KapTenss*W-KapTensd*Wm);
-                   
-                    
-                    WR=zeros(3,3);
-                    WR(2,2)=kxn2*pph/Gy1;
-                    WR(3,3)=WR(2,2);
-                    
-                    
-                   CR=1*(KapTenss+KapTensd)*WR;
+                    Akg1=zeros(3,3);
 
-
+                    
                     if(mod(Gy1,2)==1)
-                      CT= CR;
+                        Akg1(2,2)=kxn2*pph/Gy1;
                     else
-                      CT= -CR;
+                        Akg1(2,2)=-kxn2*pph/Gy1;
                     end
+                    
+                    
+                    Akg1(3,3)=Akg1(2,2);
+                    
+                    
+                    dKapTens1=1*(KapTensd-KapTenss)*Akg1;
+                    
+              
+                    tempT=tempT+dKapTens1;
 
+                    
+                   Akg2=zeros(3,3);
+                    Akg2(2,2)=kxn2*pph/Gy1;
+                   Akg2(3,3)=Akg2(2,2);
+
+
+                   dKapTens2=(KapTensd-KapTenss)*Akg2;
+           
+                    
+                   tempR=tempR+dKapTens2;
+                    
+                    if(Gx1==0)
+                        
+                       tempE=tempE+dKapTens2;
+                    end
                     
                     r1=(countG-1)*nk;
                     c1=(countG1-1)*nk;
                     for j=1:nk
                         for k=1:nk
-                            MM(r1+j,c1+k)= CA(j,k);
+                            MM(r1+j,c1+k)= -CA(j,k);
                             
                         end
                     end
@@ -437,7 +463,7 @@ if(p==1)
                 
                 
                 if(Gx1==0)
-                    v=CR*E0;
+                    v=tempE*E0;
                     for k=1:nk
                         bE((countG-1)*nk+k)=v(k);
                     end
@@ -447,40 +473,41 @@ if(p==1)
                 
                 for j=1:nk
                     for k=1:nk
-                      
-                      MM((countG-1)*nk+j,(numG+Gx1p-1)*nk+k)=-CT(j,k);
-                      MM((countG-1)*nk+j,(numG+dd+Gx1p-1)*nk+k)=-CR(j,k);
-                      
+                        
+                        MM((countG-1)*nk+j,(numG+Gx1p-1)*nk+k)=-tempT(j,k);
+                        MM((countG-1)*nk+j,(numG+dd+Gx1p-1)*nk+k)=-tempR(j,k);
+                        
                     end
                 end
                 
-        
-            if(Gx==Gx1)
-              for k=1:nk
-                if(k~=2)
+                
+                
+                if(Gx==Gx1)
+                    for k=1:nk
+                        if(k~=2)
+                            
+                            MM((Gx1p+numG-1)*nk+k,((Gx1p-1)*nGy+Gy-1)*nk+k)=pi*Gy;
+                        end
+                    end
                     
-                    MM((Gx1p+numG-1)*nk+k,((Gx1p-1)*nGy+Gy-1)*nk+k)=pi*Gy;
-                end
-              end
-              
-              if(mod(Gy,2)==0)
-                for k=1:nk
-                    if(k~=2)
-                        MM((Gx1pp+numG-1)*nk+k,((Gx1p-1)*nGy+Gy-1)*nk+k)=pi*Gy;
+                    if(mod(Gy,2)==0)
+                        for k=1:nk
+                            if(k~=2)
+                                MM((Gx1pp+numG-1)*nk+k,((Gx1p-1)*nGy+Gy-1)*nk+k)=pi*Gy;
+                            end
+                        end
+                    else
+                        for k=1:nk
+                            if(k~=2)
+                                MM((Gx1pp+numG-1)*nk+k,((Gx1p-1)*nGy+Gy-1)*nk+k)=-pi*Gy;
+                            end
+                        end
                     end
+                    
                 end
-              else
-                for k=1:nk
-                    if(k~=2)
-                        MM((Gx1pp+numG-1)*nk+k,((Gx1p-1)*nGy+Gy-1)*nk+k)=-pi*Gy;
-                    end
-                end
-              end
-              
-          end
+                
+            end
             
-        end
-        
             
         end
         
