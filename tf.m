@@ -284,7 +284,7 @@ nAg=sqrt(em);
 
  Ts=cos(2*pi*p/ndiv)^2;
  Rs=0;
-  Fr=90*sin(2*pi*p/ndiv);
+  Fr=0;%90*sin(2*pi*p/ndiv);
  
  e1=epsa(1,1);
  e2=epsb(1,1);
@@ -314,7 +314,7 @@ nAg=sqrt(em);
  nAg=.5;%.9+.02i;
  n3=nAg;
  p0=cosd(theta)/n0;
- method=2;
+ method=3;
  
 if(method==0)
 
@@ -481,7 +481,7 @@ MM=MML*Mf*MMU;
 t2=1./(m11*conj(m11));
 end  
 
-else
+elseif(method==2)
 
  M1=zeros(2,2);
  M2=zeros(2,2);
@@ -562,6 +562,116 @@ kz1=2*pi*n1*cosd(theta)/lam;
     m11=M(1,1);
   
   t2=1./(m11*conj(m11));
+
+elseif(method==3)
+
+ M1=zeros(4,4);
+ M2=zeros(4,4);
+ %%%%%%%%%%% layer 1
+
+ dn1=0.1*n1;
+ n1p=n1+dn1;
+  n1m=n1-dn1;
+
+ beta1p=2*pi*n1p*d1*cosd(theta)/lam;
+  p1p=cosd(theta)/n1p;
+  
+   beta1m=2*pi*n1m*d1*cosd(theta)/lam;
+  p1m=cosd(theta)/n1m;
+  
+M1(1,1)=cos(beta1p);
+M1(1,2)=-i*sin(beta1p)/p1p;
+M1(2,1)=-i*sin(beta1p)*p1p;
+M1(2,2)=M1(1,1);
+M1(3,3)=cos(beta1m);
+M1(3,4)=-i*sin(beta1m)/p1m;
+M1(4,3)=-i*sin(beta1m)*p1m;
+M1(4,4)=M1(3,3);
+
+
+%%%%%%%%%%% layer 2
+
+ dn2=0.0*n2;
+ n2p=n2+dn2;
+  n2m=n2-dn2;
+  
+ beta2p=2*pi*n2p*d2*cosd(theta)/lam;
+  p2p=cosd(theta)/n2p;
+  
+   beta2m=2*pi*n2m*d2*cosd(theta)/lam;
+  p2m=cosd(theta)/n2m;
+  
+M2(1,1)=cos(beta2p);
+M2(1,2)=-i*sin(beta2p)/p2p;
+M2(2,1)=-i*sin(beta2p)*p2p;
+M2(2,2)=M2(1,1);
+M2(3,3)=cos(beta2m);
+M2(3,4)=-i*sin(beta2m)/p2m;
+M2(4,3)=-i*sin(beta2m)*p2m;
+M2(4,4)=M2(3,3);
+
+
+  D0=zeros(4,4);  
+  D0(1,1)=1;
+  D0(1,2)=1;
+  D0(2,1)=cosd(theta);
+  D0(2,2)=-cosd(theta);
+  D0(3,3)=1;
+  D0(3,4)=1;
+  D0(4,3)=cosd(theta);
+  D0(4,4)=-cosd(theta);  
+    
+  ML=M1*M2;
+  MU=M2*M1;
+ % MU=M1*M2;
+   MML=ML;
+   MMU=MU;
+
+  for n=2:Na/2
+    MML=MML*ML;
+    MMU=MMU*MU;
+  end
+  
+   %%%%%%%%%%% layer in
+ M3=zeros(4,4);
+   n3=n1;
+  d3=0*d1; 
+ dn3=0.0*n3;
+ n3p=n3+dn3;
+  n3m=n3-dn3;
+
+ beta3p=2*pi*n3p*d3*cosd(theta)/lam;
+  p3p=cosd(theta)/n3p;
+  
+   beta3m=2*pi*n3m*d3*cosd(theta)/lam;
+  p3m=cosd(theta)/n3m;
+  
+M3(1,1)=cos(beta3p);
+M3(1,2)=-i*sin(beta3p)/p3p;
+M3(2,1)=-i*sin(beta3p)*p3p;
+M3(2,2)=M3(1,1);
+M3(3,3)=cos(beta3m);
+M3(3,4)=-i*sin(beta3m)/p3m;
+M3(4,3)=-i*sin(beta3m)*p3m;
+M3(4,4)=M3(3,3);
+
+  
+  MM=MML*M3*MMU;
+  
+    D0i=inv(D0);
+
+   MM=D0i*MM*D0;
+
+  
+   m11=MM(1,1);
+  m12=MM(1,2);
+  m21=MM(2,1);
+  m22=MM(2,2);
+  m33=MM(3,3);
+  t2=1./(m11*conj(m11));
+t2=1./(m33*conj(m33));
+
+Fr=0.5*atan(m11/m33)/pi*180;
 
 end
   

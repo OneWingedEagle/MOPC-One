@@ -28,14 +28,14 @@
 //epsilon of the bars. The first 3 are the elpsion sin the x , y and z direction and the forth one is the complex //part.
 //EPS_BAR
 //5.6 5.6	5.6 0.1
-//1 	1.	1. 	0.0
-2.2201  2.2201 2.2201 0.0
+1 	1.	1. 	0.0
+//2.2201  2.2201 2.2201 0.0
 //N bars *  num defects * start def
 8
 //Transmittivity  FaradayRotation
-1 0
+1 1
 // WN1	WN2 DIVISION
-0.4 .8 160
+0.3 .9 60
 0 1
 //PlotFouriesSeries   Plot3DVectors
 0 0
