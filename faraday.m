@@ -373,9 +373,9 @@ if(p==1)
                 
                 kxn2=kxn1^2;
                
-                tempT=zeros(nk,nk);
-                tempR=zeros(nk,nk);
-                tempE=zeros(nk,nk);
+                CT=zeros(nk,nk);
+                CR=zeros(nk,nk);
+                CE=zeros(nk,nk);
                 
                 for Gy1=1:nGy
                     kym=Gy1*by;
@@ -414,38 +414,27 @@ if(p==1)
 
                     CA=(KapTensd*W-KapTenss*Wm);
                     
-                    Akg1=zeros(3,3);
-
                     
+                                        
+                   WR=zeros(3,3);
+                   WR(2,2)=kxn2*pph/Gy1;
+                   WR(3,3)=WR(2,2);
+
+
+                   CC=(KapTensd-KapTenss)*WR
+                   
+                   CR=CR+CC;
+           
                     if(mod(Gy1,2)==1)
-                        Akg1(2,2)=kxn2*pph/Gy1;
+                        CT=CT+CC;
                     else
-                        Akg1(2,2)=-kxn2*pph/Gy1;
+                        CT=CT-CC;
                     end
                     
-                    
-                    Akg1(3,3)=Akg1(2,2);
-                    
-                    
-                    dKapTens1=1*(KapTensd-KapTenss)*Akg1;
-                    
-              
-                    tempT=tempT+dKapTens1;
-
-                    
-                   Akg2=zeros(3,3);
-                    Akg2(2,2)=kxn2*pph/Gy1;
-                   Akg2(3,3)=Akg2(2,2);
-
-
-                   dKapTens2=(KapTensd-KapTenss)*Akg2;
-           
-                    
-                   tempR=tempR+dKapTens2;
-                    
+                                                   
                     if(Gx1==0)
                         
-                       tempE=tempE+dKapTens2;
+                       CE=CE+CC;
                     end
                     
                     r1=(countG-1)*nk;
@@ -463,7 +452,7 @@ if(p==1)
                 
                 
                 if(Gx1==0)
-                    v=tempE*E0;
+                    v=CE*E0;
                     for k=1:nk
                         bE((countG-1)*nk+k)=v(k);
                     end
@@ -474,8 +463,8 @@ if(p==1)
                 for j=1:nk
                     for k=1:nk
                         
-                        MM((countG-1)*nk+j,(numG+Gx1p-1)*nk+k)=-tempT(j,k);
-                        MM((countG-1)*nk+j,(numG+dd+Gx1p-1)*nk+k)=-tempR(j,k);
+                        MM((countG-1)*nk+j,(numG+Gx1p-1)*nk+k)=-CT(j,k);
+                        MM((countG-1)*nk+j,(numG+dd+Gx1p-1)*nk+k)=-CR(j,k);
                         
                     end
                 end
