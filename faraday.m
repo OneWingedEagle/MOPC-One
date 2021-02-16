@@ -421,7 +421,7 @@ if(p==1)
                    WR(3,3)=WR(2,2);
 
 
-                   CC=(KapTensd-KapTenss)*WR
+                   CC=(KapTensd-KapTenss)*WR;
                    
                    CR=CR+CC;
            
@@ -839,64 +839,33 @@ end
 
 if(nk==3)
 
-tn0=E2(1,1,1)/E2(1,1,3);
+tn0=E1(1,1,1)/E1(1,1,3);
 
 
-ang0=atan(tn0);
-nan=0;
-tans1=zeros(nL,1);
+ang0=real(atan(tn0));
+tans=zeros(nL,1);
+y=zeros(nL,1);
+
 for k=1:nL
-    
-    Vx=E2(1,k,1);
-    Vz=E2(1,k,3);
-    
-    magn=sqrt(Vx^2+Vz^2);
-    
-    if( magn>-.1)
-    tans1(k)=Vx/Vz;
-        nan=nan+1;
-    else
-        tans1(k)=1e10;
-    end
-end
-
-tans=zeros(nan,1);
-y=zeros(nan,1);
-j=0;
-for k=1:nL
-    if(tans1(k)~=1e10)
-        j=j+1;
-        
-        tans(j)=tans1(k);
-        
-        y(j)=yy(k);
-    end
+ 
+	Vx=E1(1,k,1);
+    Vz=E1(1,k,3);
+	 tans(k)=Vx/Vz;
 end;
 
-angs=zeros(nan,1);
-angs(1)=atan(tans(1));
+angs=zeros(nL,1);
+angs(1)=real(atan(tans(1)));
 
-for k=2:nan
+for k=2:nL
     
-    tnp=tans(k-1);
     tn=tans(k);
-    angs(k)=-atan(tn);
-
-    if(angs(k)>0)
-  
-%    angs(k)=-180+angs(k);
-    
-    end
-
-    %  angs(k)=E2(1,k,3);
-    % angs(k)=angs(k-1)+atan((tn-tnp)/(1+tn*tnp))*180/pi;
-    
+    angs(k)=-real(atan(tn));
     
 end
 
 
 
-Fr=(angs(nan))*180/pi;
+Fr=(angs(nL))*180/pi;
 
 if(Fr>90)
  Fr=Fr-180;

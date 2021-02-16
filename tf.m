@@ -5,8 +5,6 @@ clear all
 colors = {'-or', '-ob', '-oc', '-ok','-*r', '-*b', '-*c', '-*k','-xr', '-xb', '-xc', '-xk'};
 %C = {'k','b','r','g','y'}; % Cell array of colros.
 
-
-
 [filename1,filepath1]=uigetfile('*.txt', 'Selectinput file')
  cd(filepath1)
  fid= fopen(filename1)
