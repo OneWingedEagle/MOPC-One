@@ -839,40 +839,33 @@ end
 
 if(nk==3)
 
-tn0=E1(1,1,1)/E1(1,1,3);
 
-
-ang0=real(atan(tn0));
-tans=zeros(nL,1);
+costts=zeros(nL,1);
 y=zeros(nL,1);
 
 for k=1:nL
  
-	Vx=E1(1,k,1);
-    Vz=E1(1,k,3);
-	 tans(k)=Vx/Vz;
+ Ex_sum=sum(E1(:,k,1));
+Ez_sum=sum(E1(:,k,3));
+
+   TM_fract=abs(Ex_sum)^2/(abs(Ex_sum)^2+abs(Ez_sum)^2);
+   
+ct=sqrt(TM_fract);
+costts(k)=ct;
 end;
 
 angs=zeros(nL,1);
-angs(1)=real(atan(tans(1)));
 
-for k=2:nL
+for k=1:nL
     
-    tn=tans(k);
-    angs(k)=-real(atan(tn));
+    ct=costts(k);
+    angs(k)=-acos(ct);
     
 end
 
 
 
-Fr=(angs(nL))*180/pi;
-
-if(Fr>90)
- Fr=Fr-180;
- elseif(Fr<-90)
- Fr=Fr+180;
-end
-
+Fr=90+(angs(nL))*180/pi;
 
 end
 %Eout=sqrt(E2(1,nL,1)^2+E2(1,nL,2)^2+E2(1,nL,3)^2);
