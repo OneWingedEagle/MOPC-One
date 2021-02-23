@@ -2,21 +2,20 @@ function faraday
 
 clear all
 
-colors = {'-r', '-b', '-c', '-k','-*r', '-*b',...
+colors = {'-or', '-ob', '-oc', '-ok','-*r', '-*b',...
  '-*c', '-*k','-xr', '-xb', '-xc', '-xk'};
 %C = {'k','b','r','g','y'}; % Cell array of colros.
 
 
 
-[filename1,filepath1]=uigetfile('*.txt', 'Selectinput file');
- cd(filepath1);
+[filename1,filepath1]=uigetfile('*.txt', 'Selectinput file')
+ cd(filepath1)
  fid= fopen(filename1)
 %fid = fopen('input.txt','rt');
 
 line=getNewDataLine(fid);
 numbs = str2num(line);
 geometry=numbs(1);
-
 global fext;
 rec=0;
 fext=-1;
@@ -178,8 +177,8 @@ for p=1:1*cf*ndiv+1
     Tr(p)=real(Fr);
     Tt(p)=real(Ts);
     
-    wn_fr_tr=[Fn(p)  Tr(p)  Tt(p)]
-
+     wn_fr_tr=[Fn(p)  Tr(p)  Tt(p)]
+    
     uu=Ts+Rs;
 
 end
@@ -211,6 +210,7 @@ fprintf(fid,'[wn *  Rotation * Transmitance ]\n');
   result(p,2)= Tr(p);
   result(p,3)= Tt(p);
 
+
   fprintf(fid,'%f, %f, %f\n',result(p,1),result(p,2),result(p,3));
   fprintf(fidx,'%f, %f\n',result(p,1),Fr_hom(p));
 
@@ -231,8 +231,8 @@ if(rotation &&length(Tr)>1)
              axis([wn1,wn2,-90,90]);
              hold on
              
-        %   plot(Fn,Fr_hom,'+k');
-        %     hold on
+           plot(Fn,Fr_hom,'+k');
+             hold on
 
 end
             
@@ -311,16 +311,13 @@ if(p==1)
  end
  end
 
- %Kapa(:,:,1)
  
    if(plotFT)
         
-  
+        
         ndx=30;
  	      ndy=40*Na;
-    
- nd=zeros(ndx,ndy);
- 
+        
         x=linspace(-a1/2,a1/2,ndx);
         y=linspace(-L,L,ndy);
         
@@ -346,14 +343,12 @@ if(p==1)
                 end
                 
                 zz(ix,iy)=real(tt);
-                nd(ix,iy)=zz(ix,iy);
             end
         end
         
         
     %    X=abs(Kapa(:,:,1));
 
-    %nd
         
         figure(4);
 
@@ -363,9 +358,8 @@ if(p==1)
         axis equal;
         set(gca,'DataAspectRatio',[1 1 .05]);
 %        return;
-  end
+    end
 
-    
     disp('Computing matrix, step 1...');
     
     dimx=nk*(numG+2*(Lx1));
@@ -375,7 +369,7 @@ if(p==1)
     bE=zeros(nk*(numG+2*(Lx1)),1);
     
     countG=0;
-       
+           
     for Gx=-nGx:nGx
         for Gy=1:nGy
             
@@ -405,7 +399,8 @@ if(p==1)
        
                     
                     Kapas(1:4)=Kapa(dGxp,sGyp,1:4);
-      
+
+
                                         
                     Kapad(1:4)=Kapa(dGxp,dGyp,1:4);
                     
@@ -432,7 +427,6 @@ if(p==1)
                      Wm(2,1)= -W(2,1);
 
                     CA=(KapTensd*W-KapTenss*Wm);
-                    
                     
                                         
                    WR=zeros(3,3);
@@ -495,7 +489,9 @@ if(p==1)
                         if(k~=2)
                             
                             MM((Gx1p+numG-1)*nk+k,((Gx1p-1)*nGy+Gy-1)*nk+k)=pi*Gy;
+
                         end
+                         
                     end
                     
                     if(mod(Gy,2)==0)
@@ -533,7 +529,7 @@ disp('Computing matrix, step 2...');
 
     for Gx=1:size(NN,1)
         for Gy=1:size(NN,2)
-            NN(Gx,Gy)=single(1e-10+1i*1e-10);
+            NN(Gx,Gy)=single(0+1i*0);
         end
     end
 
@@ -578,6 +574,8 @@ for Gx=-nGx:nGx
 end
 
 
+
+
 for Gx=-nGx:nGx
     Gxp=nGx+1+Gx;
     Gxpp=Lx2+Gx;
@@ -616,31 +614,42 @@ for Gx=-nGx:nGx
                 NN((numG+Gxpp-1)*nk+k,(numG+Gxpp-1)*nk+k)=-1;
             else
                 
-                NN((numG+Gxp-1)*nk+k,(numG+Gxp-1)*nk+k)=1;
+                NN((numG+Gxp-1)*nk+k,(numG+Gxp-1)*nk+k)=1.;
             
-                NN((numG+Gxpp-1)*nk+k,(numG+Gxpp-1)*nk+k)=1;
+                NN((numG+Gxpp-1)*nk+k,(numG+Gxpp-1)*nk+k)=1.;
             end
         
         if(Gx==0)
                       
             if(k~=2)
             bN((numG+Gxp-1)*nk+k)= (1i*L*k1y+1)*E0(k);
-            bN((numG+Gxpp-1)*nk+k)=E0(k);
+            if(k==1)
+              bN((numG+Gxpp-1)*nk+k)=-E0(k);
+            else
+               bN((numG+Gxpp-1)*nk+k)=E0(k);
+            end
             end
         end
     end
 end
 
-
 bN=bN+bE;
 
-  
 disp('solving matrix...');
 
 
   NN=NN+MM;   
 
-  x=linsolve(NN,bN);
+ 
+ sp=0;
+if(sp==1)
+ NNs=sparse(NN);
+bNs=sparse(bN);
+x=NNs\bNs;
+else
+ %
+ x=linsolve(NN,bN);
+end
 
 Anm=zeros(2*nGx+1,nGy,nk);
 Tn=zeros(2*nGx+1,nk);
@@ -658,8 +667,6 @@ for Gx=-nGx:nGx
         end
     end
 end
-
-
 
 
 
@@ -723,6 +730,9 @@ nL=max(int32(L*k1/2/pi)*17*2,35);
 
 yy=linspace(0,L,nL);
 
+
+if(plotWave)
+
 Nx=10;
 
 if(Nx==1)
@@ -767,6 +777,7 @@ for ix=1:Nx
     end
 end
 
+
 E1=phi+psi;
 
 E2=abs(E1);
@@ -775,7 +786,6 @@ E2(:,:,1);
 %writeMeshAndField(Nx,nL,1,E2,2,Na);
 
 
-if(plotWave)
     figure(5)
     
     set(gca,'DataAspectRatio',[1 1 1]);
@@ -833,38 +843,50 @@ if(plotWave)
 end
 
 
-if(nk==3)
+Nx=10;
+
+if(Nx==1)
+    xx=zeros(1,1);
+else
+    xx=linspace(-a1/2,a1/2,Nx);
+end
+
+phi=zeros(Nx,nk);
+psi=zeros(Nx,nk);
+
+for ix=1:Nx
+    
+    x=xx(ix);
+    
+        
+        for Gx=-nGx:nGx
+            
+            kxn=1*kx+Gx*bx;
+            
+            Gxp=nGx+1+Gx;
+           
+            for j=1:nk
+                phi(ix,j)=phi(ix,j)+Tn(Gxp,j)*exp(1i*kxn*x);
+            end
+        end
+
+end
 
 
-costts=zeros(nL,1);
-y=zeros(nL,1);
+E3=phi;
 
-for k=1:nL
- 
- Ex_sum=sum(E1(:,k,1));
-Ez_sum=sum(E1(:,k,3));
+ Ex_sum=sum(E3(:,1));
+Ez_sum=sum(E3(:,3));
  
 TM_fract=abs(Ex_sum)^2/(abs(Ex_sum)^2+abs(Ez_sum)^2);
    
 ct=sqrt(TM_fract);
 costts(k)=ct;
-end;
+   
+ angle=-acos(ct);
 
-angs=zeros(nL,1);
+Fr=90+(angle)*180/pi;
 
-for k=1:nL
-    
-    ct=costts(k);
-    angs(k)=-acos(ct);
-    
-end
-
-
-
-Fr=90+(angs(nL))*180/pi;
-
-end
-%Eout=sqrt(E2(1,nL,1)^2+E2(1,nL,2)^2+E2(1,nL,3)^2);
 
 if(plotWave)
     
@@ -879,6 +901,7 @@ if(plotWave)
 end
 
 end
+
 
 function FillKapaCylinderAntiSymDef(nGx,nGy,epsa,epsb,L,Rx,Ry,Na,a1,a2,d1,fi)
 global Kapa;
@@ -1011,8 +1034,7 @@ if(d1>0)
     end
  
 end
- 
- 
+
 Kapa=zeros(4*nGx+1,4*nGy+1,4)+1i*zeros(4*nGx+1,4*nGy+1,4);
 
 ndef
@@ -1046,7 +1068,7 @@ for n=-Na:Na-1
       end
         twindle=exp(-1i*((n+.5)*a2+sd)*by*dGy);
 
-     if(isDef(np,1))
+  if(isDef(np,1))
 
     for k=1:nk
        if(k~=4 || n>=0)
@@ -1091,8 +1113,6 @@ twindle=twindle1+twindle2;
  
 %  Kapa(:,:,:)=KappaEnds(:,:,:);
 
-
-  
 end
 
 function FillKapaCylinderAntiSym(nGx,nGy,epsa,epsb,L,R,Na,a1,a2,d1)
