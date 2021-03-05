@@ -1,0 +1,16 @@
+closeall;
+clear;
+
+E = getresult('monitor','E');
+Ex = E.Ex;
+Ez = E.Ez;
+
+Ex_tot =  sum(Ex,1);  #summing Ex allover the linear monitor in x dirction
+Ez_tot =  sum(Ez,1);  #summing Ez allover the linear monitor in x dirction
+
+
+TM_frac = abs(Ex_tot)^2/(abs(Ex_tot)^2+abs(Ez_tot)^2);   
+
+# calculation of Fadaday Rotation
+A = sqrt(TM_frac);
+?FR2 = 90-acos (A)/pi*180;

@@ -132,8 +132,8 @@ end
 line=getNewDataLine(fid);
 numbs = str2num(line);
 
-wn1=numbs(1);
-wn2=numbs(2);
+Fn1=numbs(1);
+Fn2=numbs(2);
 ndiv=numbs(3);
 
 line=getNewDataLine(fid);
@@ -149,50 +149,54 @@ plotWave=numbs(2);
 %=================
 
 t1=cputime;
-
-dwn=(wn2-wn1)/ndiv;
+if(ndiv==0)
+dFn=0;
+else
+dFn=(Fn2-Fn1)/ndiv;
+end
 
 cf=(plotWave==0);
 
 Fr_hom=zeros(1*cf*ndiv+1,1);
 
+
 for p=1:1*cf*ndiv+1
-    
-    p
-       
-    Fn(p)=wn1+dwn*(p-1);
-%   wvlen=Fn(p);
-%   wn=ay/wvlen;
+      
+     p
+     
+    Fn(p)=Fn1+dFn*(p-1);
+   % theta=p;
+
     wn=Fn(p);
     k1=sqrt(eps1)*2*pi*wn/ay;
      Fr_hom(p)=-180*gamab/sqrt(epsbx)*Na*wn;
- %    wvlen=ay/Fn(p);
-  %   wvlen
-    [Ts Rs,Fr]=calculteFaraday(geometry,epsa,epsb,eps1,eps3,ax,ay,Rx,Ry,d1,d2,Na,nGx,nGy,k1,p,plotFT,plotWave,colR,theta,fi,rec);
+
+     Fn(p)=Fn1+dFn*(p-1);
+     pp=p;
+    %  Fn(p)=theta;
+    [Ts Rs,Fr, Tsx]=calculteFaraday(geometry,epsa,epsb,eps1,eps3,ax,ay,Rx,Ry,d1,d2,Na,nGx,nGy,k1,pp,plotFT,plotWave,colR,theta,fi,rec);
            
       if(real(Ts)>1) 
       %  Ts=1;
       end
       
-    Tr(p)=real(Fr);
+   % FR(p)=real(Fr);
+ 
     Tt(p)=real(Ts);
-    
-     wn_fr_tr=[Fn(p)  Tr(p)  Tt(p)]
+    Ttx(p)=real(Tsx);
+     FR(p)=90-acos(sqrt(Ttx(p)/Tt(p)))/pi*180;
+     Fn_fr_tr_trx=[Fn(p)  FR(p)  Tt(p) Ttx(p)]
     
     uu=Ts+Rs;
 
 end
 
-
 t2=cputime;
 
 comptation_time=t2-t1;
 comptation_time;
-        
-        Tr';
-        Tt';
 	
-result=zeros(1*cf*ndiv+1,3);
+result=zeros(1*cf*ndiv+1,4);
 
 
 fidx = fopen('analyt.txt','wt');  % Note the 'wt' for writing in text mode
@@ -201,17 +205,18 @@ fid = fopen('results.txt','wt');  % Note the 'wt' for writing in text mode
 fprintf(fid,'[nGx *  nGy]\n');  
   
 fprintf(fid,'%d\t%d\n',nGx,nGy);
-fprintf(fid,'[wn *  Rotation * Transmitance ]\n');  
+fprintf(fid,'[Fn *  Rotation * Transmitance ]\n');  
 
 
   for p=1:1*cf*ndiv+1
   
   result(p,1)= Fn(p);
-  result(p,2)= Tr(p);
+  result(p,2)= FR(p);
   result(p,3)= Tt(p);
+  result(p,4)= Ttx(p);
 
 
-  fprintf(fid,'%f, %f, %f\n',result(p,1),result(p,2),result(p,3));
+  fprintf(fid,'%f, %f, %f, %f\n',result(p,1),result(p,2),result(p,3),result(p,4));
   fprintf(fidx,'%f, %f\n',result(p,1),Fr_hom(p));
 
 
@@ -220,27 +225,28 @@ fprintf(fid,'[wn *  Rotation * Transmitance ]\n');
      fclose(fidx);
      
   disp('Results:');
-  disp('[wn *  Rotation * Transmitance ]');	
+  disp('[Fn *  Rotation * Transmitance ]');	
   disp(result);
   
-if(rotation &&length(Tr)>1)
+if(rotation &&length(FR)>1)
                 figure(1)
-             plot(Fn,Tr,colR);
+             plot(Fn,FR,colR);
              
- 
-             axis([wn1,wn2,-90,90]);
+              axis([Fn1,Fn2,0,1.1*max(FR)]);
+
+            % axis([Fn1,Fn2,-90,90]);
              hold on
              
-           plot(Fn,Fr_hom,'+k');
-             hold on
+         %  plot(Fn,Fr_hom,'+k');
+         %    hold on
 
 end
             
 if(transmit &&length(Tt)>1)
               figure(2)
                plot(Fn,Tt,colT);
-                 axis([wn1,wn2,min(Tt),max(Tt)]);
-                %axis([wn1,wn2,0,1]);
+                 axis([Fn1,Fn2,min(Tt),max(Tt)]);
+                %axis([Fn1,Fn2,0,1]);
                  hold on
             
 end
@@ -249,11 +255,12 @@ end
 
 
 
-function [Ts Rs Fr]=calculteFaraday(geometry,epsa,epsb,eps1,eps3,a1,a2,...
+function [Ts Rs Fr Tsx]=calculteFaraday(geometry,epsa,epsb,eps1,eps3,a1,a2,...
 Rx,Ry,d1,d2,Na,nGx,nGy,k1,p,plotFT,plotWave,colorAng,theta,fi,rec)
 
 nk=size(epsb,2);
 
+single_percision=0; % using single or double percison numbers
 
 d=d1+d2;
 
@@ -364,7 +371,11 @@ if(p==1)
     
     dimx=nk*(numG+2*(Lx1));
    
+   if(single_percision)
     MM=  single(zeros(dimx,dimx));
+  else
+     MM=  zeros(dimx,dimx);
+    end
         
     bE=zeros(nk*(numG+2*(Lx1)),1);
     
@@ -525,11 +536,19 @@ bN=zeros(nk*(numG+2*(Lx1)),1);
 
 disp('Computing matrix, step 2...');
 
+if(single_percision)
     NN=single(zeros(nk*(numG+2*(Lx1))));
+else 
+     NN=zeros(nk*(numG+2*(Lx1)));
+end  
 
     for Gx=1:size(NN,1)
         for Gy=1:size(NN,2)
+          if(single_percision)
             NN(Gx,Gy)=single(0+1i*0);
+          else
+            NN(Gx,Gy)=0+1i*0;
+           end
         end
     end
 
@@ -645,6 +664,7 @@ disp('solving matrix...');
 if(sp==1)
  NNs=sparse(NN);
 bNs=sparse(bN);
+
 x=NNs\bNs;
 else
  %
@@ -654,6 +674,8 @@ end
 Anm=zeros(2*nGx+1,nGy,nk);
 Tn=zeros(2*nGx+1,nk);
 Tn2=zeros(2*nGx+1,1);
+Tn2x=zeros(2*nGx+1,1);
+
 Rn=zeros(2*nGx+1,nk);
 Rn2=zeros(2*nGx+1,1);
 
@@ -678,10 +700,16 @@ for Gx=-nGx:nGx
    ords(k+1)=k;
   
     for j=1:nk
+      
         Tn(k+1,j)=x(kp+k*nk+j);
-        Tn2(k+1)= Tn2(k+1)+Tn(k+1,j)*conj(Tn(k+1,j));
         
         Rn(k+1,j)=x(kpp+k*nk+j);
+        
+        if(j==1)
+         Tn2x(k+1)= Tn2x(k+1)+Tn(k+1,j)*conj(Tn(k+1,j));
+        end
+        Tn2(k+1)= Tn2(k+1)+Tn(k+1,j)*conj(Tn(k+1,j));
+
         Rn2(k+1)= Rn2(k+1)+Rn(k+1,j)*conj(Rn(k+1,j));
         
     end
@@ -690,6 +718,8 @@ for Gx=-nGx:nGx
 end
 
 Ts=0;
+Tsx=0;
+
 Rs=0;
 
 for Gx=-nGx:nGx
@@ -713,6 +743,7 @@ for Gx=-nGx:nGx
     %     Ts=Ts+Tn2(k);%/cosd(theta);
     Ts=Ts+ktny/k3*sqrt(eps3/eps1)*Tn2(k)/cosd(theta);
         %Ts=Ts+ktny/k3*sqrt(eps3/eps1)*abs(Tn(k,3))^2/cos(thetad);
+    Tsx=Tsx+ktny/k3*sqrt(eps3/eps1)*Tn2x(k)/cosd(theta);
 
     
     Rs=Rs+abs(krny)/k1*Rn2(k)/cosd(theta);
@@ -1594,6 +1625,9 @@ if(nGx==0)
 ngridx=2;
 end
 ngridy=40;
+if(nGy<2) 
+ngridy=2;
+end
 
 invep=zeros(ngridx,ngridy,nk);
 rotMat=[cosd(fi) sind(fi);-sind(fi) cosd(fi)];

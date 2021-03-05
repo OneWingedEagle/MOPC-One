@@ -1,0 +1,37 @@
+#############################################################################################
+# scriptfile: usr_importnk2_3d.lsf
+#
+# description: This file creates shows how to import
+#     a n and k data from script variables. This script also works for anisotropy.
+#
+# Copyright 2015, Lumerical Solutions, Inc.
+#############################################################################################
+clear;
+anisotropic = 1;
+
+# generate a volume of refractive index data
+x = linspace(-10,10,40);
+y = linspace(-10,10,35);
+z = linspace(-10,10,20); # set resolution to 2 for 2D
+X = meshgrid3dx(x,y,z);
+Y = meshgrid3dy(x,y,z);
+Z = meshgrid3dz(x,y,z);
+
+if (anisotropic){
+n=matrix(length(x),length(y),length(z),3); # a matrix for all 3 directions, anisotropic
+n(1:length(x), 1:length(y), 1:length(z),1) = 1.5 + sin(2*pi*X/6)*exp(-((X^2+Y^2+Z^2)/5^2)) + 0.1i*cos(Y); # x direction
+n(1:length(x), 1:length(y), 1:length(z),2) = 1.5 + 0.1i*sin(2*pi*X/6)*exp(-((X^2+Y^2+Z^2)/5^2)) + sin(Y); # y direction
+n(1:length(x), 1:length(y), 1:length(z),3) = 1.5 + cos(2*pi*Y/6)*exp(-((X^2+Y^2+Z^2)/10^2)) + 0.2i*sin(Y);# z direction
+}else{
+n=matrix(length(x),length(y),length(z)); # isotropic
+n(1:length(x), 1:length(y), 1:length(z)) = 1.5 + sin(2*pi*X/6)*exp(-((X^2+Y^2+Z^2)/5^2)) + 0.1i*cos(Y); 
+}
+
+# add an import object
+addimport;
+
+# import the data from file
+x = x*1e-6; # switch to SI units
+y = y*1e-6; # switch to SI units
+z = z*1e-6; # switch to SI units
+importnk2(n,x,y,z);

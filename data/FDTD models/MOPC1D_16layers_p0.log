@@ -1,0 +1,93 @@
+Ansys Lumerical 2020 R2.4 FDTD Solver Version 8.24.2502 (Windows 64bit)
+ expires (month/day/year): 12/31/2035
+using config file: Ansys Licensing set with ANSYSLMD_LICENSE_FILE
+license host: 
+current time: Sat Feb 27 20:45:04 2021
+Running on host: MyComputer
+host available memory (GB): 2.109759
+All processes are communicating and ready to proceed to simulation...
+Running fsp file: C:\Program Files\Lumerical\v202\bin\fdtd-engine-msmpi.exe -t 1 -remote D:/personal/abbas/aa-paper/final results/FDTD models/MOPC1D_16layers.fsp
+number of processors is 4
+processors are distributed as: 1x4x1
+Running 2D Simulation
+Starting meshing
+Simulation size in gridpoints: 3 x 557 x 1
+Refined 0 mesh cells (0%)
+Completed meshing!
+Meshing complete in 0 seconds of CPU time
+0 0
+Starting meshing
+Simulation size in gridpoints: 3 x 557 x 1
+Refined 0 mesh cells (0%)
+Completed meshing!
+Meshing complete in 0 seconds of CPU time
+0 0
+finished material properties
+Selected kernel with optimization level: 2 and split-field propagation direction: 0
+Starting meshing
+Simulation size in gridpoints: 3 x 557 x 1
+Refined 0 mesh cells (0%)
+Completed meshing!
+Meshing complete in 0 seconds of CPU time
+0 0
+Selected kernel with optimization level: 2 and split-field propagation direction: 0
+-----------------------------------------
+Beginning initialization of 2D FDTD Simulation
+  Including TE Simulation
+  Including TM Simulation
+Starting to add sources to simulation
+
+Adding Gaussian source propagating in Y
+Starting to add boundary conditions to simulation
+Adding periodic BC
+Adding periodic BC
+Adding PML BC
+Adding parallel BC
+Starting to add monitors to Simulation
+Adding analysis monitor
+Adding frequency monitor
+Adding movie monitor
+Finished initialization of 2D Simulation
+-----------------------------------------
+All processes are communicating and ready to proceed to simulation...
+Starting 304331 total iterations
+0.0157723% complete. Max time remaining: 9 mins, 53 secs. Auto Shutoff: 1
+1.34065% complete. Max time remaining: 8 mins, 13 secs. Auto Shutoff: 0.114526
+2.35007% complete. Max time remaining: 8 mins, 10 secs. Auto Shutoff: 0.0300508
+3.3595% complete. Max time remaining: 8 mins, 13 secs. Auto Shutoff: 0.0110913
+4.36893% complete. Max time remaining: 8 mins, 40 secs. Auto Shutoff: 0.0055849
+5.37835% complete. Max time remaining: 9 mins, 13 secs. Auto Shutoff: 0.00344773
+6.38778% complete. Max time remaining: 9 mins, 12 secs. Auto Shutoff: 0.00217739
+7.39721% complete. Max time remaining: 9 mins, 15 secs. Auto Shutoff: 0.0014582
+8.40664% complete. Max time remaining: 9 mins, 16 secs. Auto Shutoff: 0.000983063
+9.41606% complete. Max time remaining: 9 mins, 17 secs. Auto Shutoff: 0.00067968
+10.4255% complete. Max time remaining: 9 mins, 16 secs. Auto Shutoff: 0.000474963
+11.4349% complete. Max time remaining: 9 mins, 8 secs. Auto Shutoff: 0.000332263
+12.4443% complete. Max time remaining: 9 mins, 1 secs. Auto Shutoff: 0.0002343
+13.4538% complete. Max time remaining: 8 mins, 58 secs. Auto Shutoff: 0.000166033
+14.4632% complete. Max time remaining: 8 mins, 53 secs. Auto Shutoff: 0.000117582
+15.6409% complete. Max time remaining: 8 mins, 47 secs. Auto Shutoff: 7.84881e-05
+16.6503% complete. Max time remaining: 8 mins, 38 secs. Auto Shutoff: 5.53312e-05
+17.6597% complete. Max time remaining: 8 mins, 30 secs. Auto Shutoff: 3.95055e-05
+18.6691% complete. Max time remaining: 8 mins, 22 secs. Auto Shutoff: 2.80708e-05
+19.6786% complete. Max time remaining: 8 mins, 14 secs. Auto Shutoff: 1.99828e-05
+20.688% complete. Max time remaining: 8 mins, 7 secs. Auto Shutoff: 1.43251e-05
+21.6974% complete. Max time remaining: 7 mins, 59 secs. Auto Shutoff: 1.02355e-05
+100% complete. Max time remaining: 0 mins, 0 secs. Auto Shutoff: 9.9684e-06
+Early termination of simulation, the autoshutoff criteria are satisfied.
+Completed 66144 iterations, or 2.173423e-12s of Simulation Time
+Process 0 starting to collect data
+    collecting TM monitor data
+    collecting TE monitor data
+    collecting TM source data
+    collecting TE source data
+Finished collecting data
+Simulation completed successfully at: Sat Feb 27 20:47:17 2021
+Overall wall time measurements in seconds: 134.483
+    time to mesh and initialize: 0.0561061
+    time to run FDTD simulation: 133.033
+    time to checkpoint simulation: 4e-07
+    time to finalize data and save to files: 0.116336
+    miscellaneous time: 1.27734
+    FDTD solver speed on process 0: 0.830819 Mnodes/s
+    total FDTD solver speed on 4 processes: 3.32328 Mnodes/s
