@@ -1,5 +1,7 @@
 function charter
   
+ 
+  
   ndata=6;
 %[filename1,filepath1]=uigetfile('*.txt', 'Selectinput file')
 % D:\Works and Studies\Photonic\Lumerical\models\faradary_isolator
