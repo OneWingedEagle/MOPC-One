@@ -5,6 +5,8 @@ clear all
 colors = {'-or', '-ob', '-oc', '-ok','-*r', '-*b', '-*c', '-*k','-xr', '-xb', '-xc', '-xk'};
 %C = {'k','b','r','g','y'}; % Cell array of colros.
 
+
+
 [filename1,filepath1]=uigetfile('*.txt', 'Selectinput file')
  cd(filepath1)
  fid= fopen(filename1)
@@ -163,15 +165,7 @@ for p=1:1*cf*ndiv+1
     %p
     
      Fn(p)=wn1+dwn*(p-1);
-    
     wvlen=Fn(p);
-   %  wvlen= d*Fn(p)
-   %  wvlen=d/Fn(p);
-    % wvlen
-   % Fn(p)=wn1+dwn*(p-1);
-   % k1=sqrt(eps1)*2*pi*Fn(p)/ay;
-    % Fr_hom(p)=-180*gamab/sqrt(epsbx)*Na*Fn(p);
-    
 
    [Ts Rs,Fr]=calculteFaraday(geometry,epsa,epsb,eps1,eps3,d1,d2,d3,Na,wvlen,p,theta,fi,TE);
            
@@ -282,7 +276,7 @@ nAg=sqrt(em);
 
  Ts=cos(2*pi*p/ndiv)^2;
  Rs=0;
-  Fr=0;%90*sin(2*pi*p/ndiv);
+  Fr=90*sin(2*pi*p/ndiv);
  
  e1=epsa(1,1);
  e2=epsb(1,1);
@@ -304,15 +298,15 @@ nAg=sqrt(em);
  
  n1=sqrt(e1);
  n2=sqrt(e2);
-
- %n1=2.17;
- %n2=1.49;
+ 
+ n1=2.17;
+ n2=1.49;
 
  %nAg=.01+3i;
  nAg=.5;%.9+.02i;
  n3=nAg;
  p0=cosd(theta)/n0;
- method=3;
+ method=2;
  
 if(method==0)
 
@@ -357,19 +351,35 @@ M3(2,1)=-i*sin(beta3)*p3;
 M3(2,2)=M3(1,1);
 
   ML=M1*M2;
-
+  MU=M2*M1;
 
    MML=ML;
+   MMU=MU;
 
-  for n=2:Na
+  for n=2:Na/2
     MML=MML*ML;
-
+    MMU=MMU*MU;
   end
+  %MM=MML*MMU;
   
    nf=n1;
+ df=d3;
+   betaf=2*pi*nf*df*cosd(theta)/lam;
+ if(TE==0)
+  pf=cosd(theta)/nf;
+else
+  pf=cosd(theta)*nf;
+end
 
+  Mf=zeros(2,2);
+Mf(1,1)=cos(betaf);
+Mf(1,2)=-i*sin(betaf)/pf;
+Mf(2,1)=-i*sin(betaf)*pf;
+Mf(2,2)=Mf(1,1);
+
+MM=MML*Mf*MMU;
   
-  MM=MML;
+ % MM=MMU;
 
   m11=MM(1,1);
   m12=MM(1,2);
@@ -516,8 +526,8 @@ kz1=2*pi*n1*cosd(theta)/lam;
   M2=D2*P2*inv(D2);
 
   ML=M1*M2;
-%MU=M2*M1;
-  MU=M1*M2;
+  MU=M2*M1;
+
    MML=ML;
    MMU=MU;
 
@@ -525,7 +535,8 @@ kz1=2*pi*n1*cosd(theta)/lam;
     MML=MML*ML;
     MMU=MMU*MU;
   end
- % n3=n1;
+  %MM=MML*MMU;
+  n3=n1;
    %%%%%%%%%%% defect layer
    kz3=2*pi*n3*cosd(theta)/lam;
   phi3=kz3*d3;
@@ -542,9 +553,7 @@ kz1=2*pi*n1*cosd(theta)/lam;
     
     M3=D3*P3*inv(D3);
   
- % MM=MML*M3*MMU;
-   MM=MML*MMU;
-
+  MM=MML*M3*MMU;
    %%%%%%%%%%%
   kz0=2*pi*n0*cosd(theta)/lam;  
     D0=zeros(2,2);
@@ -560,116 +569,6 @@ kz1=2*pi*n1*cosd(theta)/lam;
     m11=M(1,1);
   
   t2=1./(m11*conj(m11));
-
-elseif(method==3)
-
- M1=zeros(4,4);
- M2=zeros(4,4);
- %%%%%%%%%%% layer 1
-
- dn1=0.1*n1;
- n1p=n1+dn1;
-  n1m=n1-dn1;
-
- beta1p=2*pi*n1p*d1*cosd(theta)/lam;
-  p1p=cosd(theta)/n1p;
-  
-   beta1m=2*pi*n1m*d1*cosd(theta)/lam;
-  p1m=cosd(theta)/n1m;
-  
-M1(1,1)=cos(beta1p);
-M1(1,2)=-i*sin(beta1p)/p1p;
-M1(2,1)=-i*sin(beta1p)*p1p;
-M1(2,2)=M1(1,1);
-M1(3,3)=cos(beta1m);
-M1(3,4)=-i*sin(beta1m)/p1m;
-M1(4,3)=-i*sin(beta1m)*p1m;
-M1(4,4)=M1(3,3);
-
-
-%%%%%%%%%%% layer 2
-
- dn2=0.0*n2;
- n2p=n2+dn2;
-  n2m=n2-dn2;
-  
- beta2p=2*pi*n2p*d2*cosd(theta)/lam;
-  p2p=cosd(theta)/n2p;
-  
-   beta2m=2*pi*n2m*d2*cosd(theta)/lam;
-  p2m=cosd(theta)/n2m;
-  
-M2(1,1)=cos(beta2p);
-M2(1,2)=-i*sin(beta2p)/p2p;
-M2(2,1)=-i*sin(beta2p)*p2p;
-M2(2,2)=M2(1,1);
-M2(3,3)=cos(beta2m);
-M2(3,4)=-i*sin(beta2m)/p2m;
-M2(4,3)=-i*sin(beta2m)*p2m;
-M2(4,4)=M2(3,3);
-
-
-  D0=zeros(4,4);  
-  D0(1,1)=1;
-  D0(1,2)=1;
-  D0(2,1)=cosd(theta);
-  D0(2,2)=-cosd(theta);
-  D0(3,3)=1;
-  D0(3,4)=1;
-  D0(4,3)=cosd(theta);
-  D0(4,4)=-cosd(theta);  
-    
-  ML=M1*M2;
-  MU=M2*M1;
- % MU=M1*M2;
-   MML=ML;
-   MMU=MU;
-
-  for n=2:Na/2
-    MML=MML*ML;
-    MMU=MMU*MU;
-  end
-  
-   %%%%%%%%%%% layer in
- M3=zeros(4,4);
-   n3=n1;
-  d3=0*d1; 
- dn3=0.0*n3;
- n3p=n3+dn3;
-  n3m=n3-dn3;
-
- beta3p=2*pi*n3p*d3*cosd(theta)/lam;
-  p3p=cosd(theta)/n3p;
-  
-   beta3m=2*pi*n3m*d3*cosd(theta)/lam;
-  p3m=cosd(theta)/n3m;
-  
-M3(1,1)=cos(beta3p);
-M3(1,2)=-i*sin(beta3p)/p3p;
-M3(2,1)=-i*sin(beta3p)*p3p;
-M3(2,2)=M3(1,1);
-M3(3,3)=cos(beta3m);
-M3(3,4)=-i*sin(beta3m)/p3m;
-M3(4,3)=-i*sin(beta3m)*p3m;
-M3(4,4)=M3(3,3);
-
-  
-  MM=MML*M3*MMU;
-  
-    D0i=inv(D0);
-
-   MM=D0i*MM*D0;
-
-  
-   m11=MM(1,1);
-  m12=MM(1,2);
-  m21=MM(2,1);
-  m22=MM(2,2);
-  m33=MM(3,3);
-  t2=1./(m11*conj(m11));
-t2=1./(m33*conj(m33));
-
-Fr=0.5*atan(m11/m33)/pi*180;
 
 end
   
@@ -688,121 +587,6 @@ TF = strncmpi(line,'/',1);
 k=k+1;
 
 end
-
-
-end
-
-
-function [h]=arrow3d(x,y,z,head_frac,radii,radii2,colr)
-%
-% The function plotting 3-dimensional arrow
-%
-% h=arrow3d(x,y,z,head_frac,radii,radii2,colr)
-%
-% The inputs are:
-%       x,y,z =  vectors of the starting point and the ending point of the
-%           arrow, e.g.:  x=[x_start, x_end]; y=[y_start, y_end];z=[z_start,z_end];
-%       head_frac = fraction of the arrow length where the head should  start
-%       radii = radius of the arrow
-%       radii2 = radius of the arrow head (defult = radii*2)
-%       colr =   color of the arrow, can be string of the color name, or RGB vector  (default='blue')
-%
-% The output is the handle of the surfaceplot graphics object.
-% The settings of the plot can changed using: set(h, 'PropertyName', PropertyValue)
-%
-% example #1:
-%        arrow3d([0 0],[0 0],[0 6],.5,3,4,[1 0 .5]);
-% example #2:
-%        arrow3d([2 0],[5 0],[0 -6],.2,3,5,'r');
-% example #3:
-%        h = arrow3d([1 0],[0 1],[-2 3],.8,3);
-%        set(h,'facecolor',[1 0 0])
-%
-% Written by Moshe Lindner , Bar-Ilan University, Israel.
-% July 2010 (C)
-
-if nargin==5
-    radii2=radii*2;
-    colr='blue';
-elseif nargin==6
-    colr='blue';
-end
-if size(x,1)==2
-    x=x';
-    y=y';
-    z=z';
-end
-
-x(3)=x(2);
-x(2)=x(1)+head_frac*(x(3)-x(1));
-y(3)=y(2);
-y(2)=y(1)+head_frac*(y(3)-y(1));
-z(3)=z(2);
-z(2)=z(1)+head_frac*(z(3)-z(1));
-r=[x(1:2)',y(1:2)',z(1:2)'];
-
-N=10;
-dr=diff(r);
-dr(end+1,:)=dr(end,:);
-origin_shift=(ones(size(r))*(1+max(abs(r(:))))+[dr(:,1) 2*dr(:,2) -dr(:,3)]);
-r=r+origin_shift;
-
-normdr=(sqrt((dr(:,1).^2)+(dr(:,2).^2)+(dr(:,3).^2)));
-normdr=[normdr,normdr,normdr];
-dr=dr./normdr;
-Pc=r;
-n1=cross(dr,Pc);
-normn1=(sqrt((n1(:,1).^2)+(n1(:,2).^2)+(n1(:,3).^2)));
-normn1=[normn1,normn1,normn1];
-n1=n1./normn1;
-P1=n1+Pc;
-
-X1=[];Y1=[];Z1=[];
-j=1;
-for theta=([0:N])*2*pi./(N);
-    R1=Pc+radii*cos(theta).*(P1-Pc) + radii*sin(theta).*cross(dr,(P1-Pc)) -origin_shift;
-    X1(2:3,j)=R1(:,1);
-    Y1(2:3,j)=R1(:,2);
-    Z1(2:3,j)=R1(:,3);
-    j=j+1;
-end
-
-r=[x(2:3)',y(2:3)',z(2:3)'];
-
-dr=diff(r);
-dr(end+1,:)=dr(end,:);
-origin_shift=(ones(size(r))*(1+max(abs(r(:))))+[dr(:,1) 2*dr(:,2) -dr(:,3)]);
-r=r+origin_shift;
-
-normdr=(sqrt((dr(:,1).^2)+(dr(:,2).^2)+(dr(:,3).^2)));
-normdr=[normdr,normdr,normdr];
-dr=dr./normdr;
-Pc=r;
-n1=cross(dr,Pc);
-normn1=(sqrt((n1(:,1).^2)+(n1(:,2).^2)+(n1(:,3).^2)));
-normn1=[normn1,normn1,normn1];
-n1=n1./normn1;
-P1=n1+Pc;
-
-j=1;
-for theta=([0:N])*2*pi./(N);
-    R1=Pc+radii2*cos(theta).*(P1-Pc) + radii2*sin(theta).*cross(dr,(P1-Pc)) -origin_shift;
-    X1(4:5,j)=R1(:,1);
-    Y1(4:5,j)=R1(:,2);
-    Z1(4:5,j)=R1(:,3);
-    j=j+1;
-end
-
-X1(1,:)=X1(1,:)*0 + x(1);
-Y1(1,:)=Y1(1,:)*0 + y(1);
-Z1(1,:)=Z1(1,:)*0 + z(1);
-X1(5,:)=X1(5,:)*0 + x(3);
-Y1(5,:)=Y1(5,:)*0 + y(3);
-Z1(5,:)=Z1(5,:)*0 + z(3);
-
-h=surf(X1,Y1,Z1,'facecolor',colr,'edgecolor','none');
-
-light('Color','r')
 
 
 end

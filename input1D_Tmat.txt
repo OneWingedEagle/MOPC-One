@@ -7,7 +7,7 @@
 //GEOMETRY 
 0     
 //0.082  0.082 .0
-20  0
+1.  0
 //Rx Ry
 //fi  anticlockiwise angle of elipse axis with x-axis.  angle is given in degrees.
 0
@@ -31,7 +31,7 @@
 1 	1.	1. 	0.0
 //2.2201  2.2201 2.2201 0.0
 //N bars *  num defects * start def
-1
+20
 //Transmittivity  FaradayRotation
 1 1
 // WN1	WN2 DIVISION

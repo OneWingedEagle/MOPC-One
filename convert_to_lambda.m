@@ -3,7 +3,7 @@ function convert_to_lambda
 %filename= 'D:\Works and Studies\Photonic\Lumerical\models\faradary_isolator\results-7-180s-108.txt';
 %[filename,filepath]=uigetfile('*.txt', 'Select results file')
 %file=strcat(filepath,strcat('\',filename));
-file ='D:\personal\abbas\aa-paper\final results\1D\results_mansuripour600.txt';
+file ='D:\personal\abbas\aa-paper\final results\1D\results-slab_4000.txt';
 data=csvread(file,3,0);
      
 

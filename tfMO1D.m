@@ -3,106 +3,145 @@ function tf
 clear all
 
 colors = {'-or', '-ob', '-oc', '-ok','-*r', '-*b', '-*c', '-*k','-xr', '-xb', '-xc', '-xk'};
-%C = {'k','b','r','g','y'}; % Cell array of colros.
 
 [filename1,filepath1]=uigetfile('*.txt', 'Selectinput file')
  cd(filepath1)
  fid= fopen(filename1)
-%fid = fopen('input.txt','rt');
+%%  ==== Indicent angle
+line=getNewDataLine(fid);
+numbs = str2num(line);
+theta= numbs(1);
 
+%%=========  stack befor defect
+dd1=[0 0 0];
+eps1=[1 1 1];
+gama1=[0 0 0];
 line=getNewDataLine(fid);
 numbs = str2num(line);
-geometry=numbs(1);
-rec=0;
-if(geometry==1 && length(numbs)>1)
-rec=numbs(2);
-end
-rec
-line=getNewDataLine(fid);
-numbs = str2num(line);
-d1=numbs(1);
-d2=0;
+dd1(1)=numbs(1);
+
 if(length(numbs)>1)
-d2=numbs(2);
-end
-d3=0;
-if(length(numbs)>2)
-d3=numbs(3);
-end
-
-line=getNewDataLine(fid);
-numbs = str2num(line);
-fi=numbs(1);
-
-line=getNewDataLine(fid);
-numbs = str2num(line);
-theta=numbs(1);
-global inc_mode;
-inc_mode=0;
-if(length(numbs)>1)
-inc_mode=numbs(2);
-end
-
-line=getNewDataLine(fid);
-numbs = str2num(line);
-ax=numbs(1);
-ay=numbs(2);
-
-line=getNewDataLine(fid);
-numbs = str2num(line);
-eps1=numbs(1);
-eps3=numbs(2);
-
-line=getNewDataLine(fid);
-numbs = str2num(line);
-ndata=length(numbs)
-
-epsbx=numbs(1);
-if(ndata>1)
-epsby=numbs(2);
-epsbz=numbs(3);
-gamab=numbs(4);
-end
-
-line=getNewDataLine(fid);
-numbs = str2num(line);
-epsax=numbs(1);
-if(ndata>1)
-epsay=numbs(2);
-epsaz=numbs(3);
-gamaa=numbs(4);
-end
-
-if(ndata>1)
-
-epsb=[epsbx 0 -1i*gamab;0 epsby 0;1i*gamab 0 epsbz ];
-
-epsa=[epsax 0 -1i*gamaa;0 epsay 0;1i*gamaa 0 epsaz ];
-else
-epsb=[epsbx];
-
-epsa=[epsax];
-end
-
-line=getNewDataLine(fid);
-numbs = str2num(line);
-Na=numbs(1);
-global ndef;
-global defstart;
-ndef=0;
-defstart=0;
-if(length(numbs)>1)
-ndef=numbs(2);
-defstart=floor(Na/2);
+dd1(2)=numbs(2);
 end
 if(length(numbs)>2)
-defstart=numbs(3);
+dd1(3)=numbs(3);
 end
+
+line=getNewDataLine(fid);
+numbs = str2num(line);
+eps1(1)=numbs(1);
+
+if(length(numbs)>1)
+eps1(2)=numbs(2);
+end
+if(length(numbs)>2)
+eps1(3)=numbs(3);
+end
+
+line=getNewDataLine(fid);
+numbs = str2num(line);
+gama1(1)=numbs(1);
+
+if(length(numbs)>1)
+gama1(2)=numbs(2);
+end
+if(length(numbs)>2)
+gama1(3)=numbs(3);
+end
+%%=============
+
+%%=========   defect stack
+ddef=[0 0 0];
+epsdef=[1 1 1];
+gamadef=[0 0 0];
+line=getNewDataLine(fid);
+numbs = str2num(line);
+ddef(1)=numbs(1);
+
+if(length(numbs)>1)
+ddef(2)=numbs(2);
+end
+if(length(numbs)>2)
+ddef(3)=numbs(3);
+end
+
+line=getNewDataLine(fid);
+numbs = str2num(line);
+epsdef(1)=numbs(1);
+
+if(length(numbs)>1)
+epsdef(2)=numbs(2);
+end
+if(length(numbs)>2)
+epsdef(3)=numbs(3);
+end
+
+line=getNewDataLine(fid);
+numbs = str2num(line);
+gamadef(1)=numbs(1);
+
+if(length(numbs)>1)
+gamadef(2)=numbs(2);
+end
+if(length(numbs)>2)
+gamadef(3)=numbs(3);
+end
+%%=============
+
+%%=========  stack befor defect
+dd2=[0 0 0];
+eps2=[1 1 1];
+gama2=[0 0 0];
+line=getNewDataLine(fid);
+numbs = str2num(line);
+dd2(1)=numbs(1);
+
+if(length(numbs)>1)
+dd2(2)=numbs(2);
+end
+if(length(numbs)>2)
+dd2(3)=numbs(3);
+end
+
+line=getNewDataLine(fid);
+numbs = str2num(line);
+eps2(1)=numbs(1);
+
+if(length(numbs)>1)
+eps2(2)=numbs(2);
+end
+if(length(numbs)>2)
+eps2(3)=numbs(3);
+end
+line=getNewDataLine(fid);
+numbs = str2num(line);
+gama2(1)=numbs(1);
+
+if(length(numbs)>1)
+gama2(2)=numbs(2);
+end
+if(length(numbs)>2)
+gama2(3)=numbs(3);
+end
+%%==========================
+
+
+line=getNewDataLine(fid);
+numbs = str2num(line);
+N1=numbs(1);
+Ndff=0;
+N2=0;
+if(length(numbs)>1)
+Ndef=numbs(2);
+end
+if(length(numbs)>2)
+N2=numbs(3);
+end
+
 line=getNewDataLine(fid);
 numbs = str2num(line);
 transmit=numbs(1);
 rotation=numbs(2);
-
 
 if(transmit>0)
 colT=colors{transmit};
@@ -127,53 +166,25 @@ wn2=numbs(2);
 global ndiv;
 ndiv=numbs(3);
 
-line=getNewDataLine(fid);
-numbs = str2num(line);
-nGx=numbs(1)
-nGy=numbs(2)
-
-line=getNewDataLine(fid);
-numbs = str2num(line);
-plotFT=numbs(1);
-plotWave=numbs(2);
-
-
-
 %=================
 
 t1=cputime;
 
 dwn=(wn2-wn1)/ndiv;
 
-cf=(plotWave==0);
+Fr_hom=zeros(ndiv+1,1);
 
-Fr_hom=zeros(1*cf*ndiv+1,1);
-
- d=d1+d2+d3;
- 
- TE=0;
-for m=1:1
-
-if(m==2)
- TE=1;
- colT='-ok';
-end
-for p=1:1*cf*ndiv+1
+for p=1:ndiv+1
     
     %p
     
      Fn(p)=wn1+dwn*(p-1);
     
     wvlen=Fn(p);
-   %  wvlen= d*Fn(p)
-   %  wvlen=d/Fn(p);
-    % wvlen
-   % Fn(p)=wn1+dwn*(p-1);
-   % k1=sqrt(eps1)*2*pi*Fn(p)/ay;
-    % Fr_hom(p)=-180*gamab/sqrt(epsbx)*Na*Fn(p);
-    
 
-   [Ts Rs,Fr]=calculteFaraday(geometry,epsa,epsb,eps1,eps3,d1,d2,d3,Na,wvlen,p,theta,fi,TE);
+
+   [Ts Rs,Fr]=TransferMatrixMultiLayer(eps1,epsdef,eps2,gama1,gamadef,...
+   gama1,dd1,ddef,dd2,N1,Ndef,N2,wvlen,p,theta);
            
       if(real(Ts)>1) 
       %  Ts=1;
@@ -195,7 +206,7 @@ comptation_time;
         Tr';
         Tt';
 	
-result=zeros(1*cf*ndiv+1,3);
+result=zeros(ndiv+1,3);
 
 
 %fidx = fopen('analyt.txt','wt');  % Note the 'wt' for writing in text mode
@@ -203,11 +214,11 @@ fid = fopen('results.txt','wt');  % Note the 'wt' for writing in text mode
 
 fprintf(fid,'[nGx *  nGy]\n');  
   
-fprintf(fid,'%d\t%d\n',nGx,nGy);
+fprintf(fid,'**************b\n');  
 fprintf(fid,'[wn *  Rotation * Transmitance ]\n');  
 
 
-  for p=1:1*cf*ndiv+1
+  for p=1:ndiv+1
   
   result(p,1)= Fn(p);
   result(p,2)= Tr(p);
@@ -249,51 +260,72 @@ end
 
 end
 
-end
 
 
-
-function [Ts Rs Fr]=calculteFaraday(geometry,epsa,epsb,eps1,eps3,...
-d1,d2,d3,Na,wvlen,p,theta,fi, TE)
-
-nk=size(epsb,2);
-
-global MM;
-
-global Kapa;
-global bE;
-global ndiv;
-
+function [Ts Rs Fr]=TransferMatrixMultiLayer(eps1,epsdef,eps2,...,
+  gama1,gamadef,gama2,dd1,ddef,dd2,N1,Ndef,N2,wvlen,p,theta)
 
 
  lam=wvlen;
-  d=d1;
-%%% eps
 
-%c=3.0e8;
 omega=2*pi/lam;
-
 
 Ts=1;
  Rs=0;
-  Fr=0;%90*sin(2*pi*p/ndiv);
-  
-   e1=epsb(1,1);
-   gam=epsb(1,3)/(-1i);
-
-  D0=DynamicMatrix(1,0,omega);
-    D0;
-    omega
-    MM1=TransferMatrix(e1,gam,omega,d);
-    
-   MM=MM1;
-   
-  for n=2:Na
-    MM=MM1*MM;
+  Fr=0;
+ 
+  %$$$$============= stacks before defect
+  T1=TransferMatrix(eps1(1),gama1(1),omega,dd1(1));
+  T2=TransferMatrix(eps1(2),gama1(2),omega,dd1(2));
+  T3=TransferMatrix(eps1(3),gama1(3),omega,dd1(3));
+  %%%%%%%%%%%%%%%
+ %  T123=T1*T2*T3;
+   T123= T1;
+   TT1=T123;
+     
+  for n=2:N1
+    TT1=T123*TT1;
   end
+  
+    %$$$$============= defect layer
+  if(Ndef>0)
+  T1=TransferMatrix(epsdef(1),gamadef(1),omega,ddef(1));
+  T2=TransferMatrix(epsdef(2),gamadef(2),omega,ddef(2));
+  T3=TransferMatrix(epsdef(3),gamadef(3),omega,ddef(3));
+   T123=T1*T2*T3;
+   Tdef=T123;
+  for n=2:Ndef
+    Tdef=T123*Tdef;
+  end
+  
+end
 
-  TT=inv(D0)*MM*D0;
- %  TT=D0*MM*inv(D0);
+
+  %$$$$============= stacks after defect
+  if(N2>0)
+  T1=TransferMatrix(eps2(1),gama2(1),omega,dd2(1));
+  T2=TransferMatrix(eps2(2),gama2(2),omega,dd2(2));
+  T3=TransferMatrix(eps2(3),gama2(3),omega,dd2(3));
+  %%%%%%%%%%%%%%%
+   T123=T1*T2*T3;
+   TT2=T123;
+  for n=2:N2
+    TT2=T123*TT2;
+  end
+end
+
+  T=TT1;
+  if(Ndef>0)
+  T=Tdef*T;
+  end;
+  if(N2>0)
+  T=TT2*T;
+  end;
+  
+  
+  D0=DynamicMatrix(1,0,omega);
+  
+  TT=inv(D0)*T*D0;
  
   angle=TT(3,3)/TT(1,1);
   
@@ -302,23 +334,9 @@ Ts=1;
   t2=1./(TT(1,1)*conj(TT(1,1)));
 
  Ts=abs(t2);
-  
+
 end
 
-
-function [T]=TransferMatrix(eps,gamma,omega,d)
-  
-     Q=gamma/eps;
-
-  Dn=DynamicMatrix(eps,Q,omega);
-  
-  Pn=PropagationMatrix(eps,Q,omega,d);
-
-  D0=DynamicMatrix(1,0,omega);
-
-   T=Dn*Pn*inv(Dn);
-    
-end
 
 function [Dn]=DynamicMatrix(e1, Q,omega)
 
@@ -345,6 +363,21 @@ function [Dn]=DynamicMatrix(e1, Q,omega)
      qv1(2) qv2(2) qv3(2) qv4(2);...
     pv1(2) pv2(2) pv3(2) pv4(2);...
     qv1(1) qv2(1) qv3(1) qv4(1)];
+end
+
+
+function [T]=TransferMatrix(eps,gamma,omega,d)
+  
+     Q=gamma/eps;
+
+  Dn=DynamicMatrix(eps,Q,omega);
+  
+  Pn=PropagationMatrix(eps,Q,omega,d);
+
+  D0=DynamicMatrix(1,0,omega);
+
+   T=Dn*Pn*inv(Dn);
+    
 end
 
 function [Pn]=PropagationMatrix(e1, Q,omega,d)
@@ -384,5 +417,3 @@ end
 
 
 end
-
-

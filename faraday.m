@@ -180,11 +180,10 @@ for p=1:1*cf*ndiv+1
       %  Ts=1;
       end
       
-   % FR(p)=real(Fr);
+    FR(p)=real(Fr);
  
     Tt(p)=real(Ts);
     Ttx(p)=real(Tsx);
-     FR(p)=90-acos(sqrt(Ttx(p)/Tt(p)))/pi*180;
      Fn_fr_tr_trx=[Fn(p)  FR(p)  Tt(p) Ttx(p)]
     
     uu=Ts+Rs;
@@ -764,7 +763,7 @@ yy=linspace(0,L,nL);
 
 if(plotWave)
 
-Nx=10;
+Nx=1;
 
 if(Nx==1)
     xx=zeros(1,1);
@@ -882,10 +881,12 @@ else
     xx=linspace(-a1/2,a1/2,Nx);
 end
 
-phi=zeros(Nx,nk);
-psi=zeros(Nx,nk);
+E3=zeros(Nx,nk);
+E1=zeros(Nx,nk);
 
 for ix=1:Nx
+    
+    E1(ix,:)=E0(:);
     
     x=xx(ix);
     
@@ -897,27 +898,31 @@ for ix=1:Nx
             Gxp=nGx+1+Gx;
            
             for j=1:nk
-                phi(ix,j)=phi(ix,j)+Tn(Gxp,j)*exp(1i*kxn*x);
+                E3(ix,j)=E3(ix,j)+Tn(Gxp,j)*exp(1i*kxn*x);
+                 E1(ix,j)=E1(ix,j)+Rn(Gxp,j)*exp(1i*kxn*x);
             end
         end
 
 end
 
+Ex1_sum=sum(E1(:,1));
+Ez1_sum=sum(E1(:,3));
+TM_fract1=abs(Ex1_sum)^2/(abs(Ex1_sum)^2+abs(Ez1_sum)^2);
+ct1=sqrt(TM_fract1);
+angle0=-acos(ct1);
+ Ex3_sum=sum(E3(:,1));
+Ez3_sum=sum(E3(:,3));
 
-E3=phi;
-
- Ex_sum=sum(E3(:,1));
-Ez_sum=sum(E3(:,3));
- 
-TM_fract=abs(Ex_sum)^2/(abs(Ex_sum)^2+abs(Ez_sum)^2);
+TM_fract=abs(Ex3_sum)^2/(abs(Ex3_sum)^2+abs(Ez3_sum)^2);
    
 ct=sqrt(TM_fract);
-costts(k)=ct;
    
  angle=-acos(ct);
 
 Fr=90+(angle)*180/pi;
+Fr0=90+(angle0)*180/pi;
 
+%%%%Fr=(Fr-Fr0);
 
 if(plotWave)
     

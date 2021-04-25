@@ -1,0 +1,33 @@
+//the input file tfMO1D.m matlab code
+///=============================
+// theta
+0
+///=============================
+// d1 d2 d3 before defect (micron)
+0.3857 0.3857	0  
+//EPS1 EPS2 EPS3  before defect
+4.884	3.9	 1.0
+//GAMMA1 GAMMA2 GAMMA3 before defect
+0.009  0.0 0.0
+///=============================
+//Defect stack
+// d1 d2 d3 defect
+.755  0	0  
+//EPS1 EPS2 EPS3 stack
+4.884	4.884 4.884 
+//GAMMA1 GAMMA2 GAMMA3 defect
+0.009 0.009 0.009 
+///=============================
+// d1 d2 d3 after defect
+0.3857 0.3857	0  
+//EPS1 EPS2 EPS3  after defect
+3.9	4.884 1.0
+//GAMMA1 GAMMA2 GAMMA3 after defect
+0.00  0.009  0.0
+///=============================
+//Num_STACKS_before_def *  num defects * Num_STACKS_before_def
+9   2   9  
+//Transmittivity  FaradayRotation
+1 1
+// WN1	WN2 DIVISION
+0.8 2.2 180
