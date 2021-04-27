@@ -4,11 +4,11 @@
 0
 ///=============================
 // d1 d2 d3 before defect (micron)
-0.3857 0.3857	0  
+0.5 0.5	0  
 //EPS1 EPS2 EPS3  before defect
-4.884	3.9	 1.0
+5.5	5.5	 1.0
 //GAMMA1 GAMMA2 GAMMA3 before defect
-0.009  0.0 0.0
+0.01  0.0 0.0
 ///=============================
 //Defect stack
 // d1 d2 d3 defect
@@ -26,8 +26,8 @@
 0.0  0.009  0.0
 ///=============================
 //Num_STACKS_before_def *  num defects * Num_STACKS_before_def
-9   2   9  
+20    
 //Transmittivity  FaradayRotation
 1 1
 // WN1	WN2 DIVISION
-0.8 2.2 160
+0.545 .555 80

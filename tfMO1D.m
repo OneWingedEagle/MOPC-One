@@ -129,7 +129,7 @@ end
 line=getNewDataLine(fid);
 numbs = str2num(line);
 N1=numbs(1);
-Ndff=0;
+Ndef=0;
 N2=0;
 if(length(numbs)>1)
 Ndef=numbs(2);
@@ -279,8 +279,7 @@ Ts=1;
   T2=TransferMatrix(eps1(2),gama1(2),omega,dd1(2));
   T3=TransferMatrix(eps1(3),gama1(3),omega,dd1(3));
   %%%%%%%%%%%%%%%
- %  T123=T1*T2*T3;
-   T123= T1;
+   T123=T1*T2*T3;
    TT1=T123;
      
   for n=2:N1

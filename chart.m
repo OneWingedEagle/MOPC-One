@@ -1,33 +1,5 @@
 function charter
   
-  
- N=1000;
- 
- dx=0.01/N;
- 
- dd=zeros(N,1);
- 
- xx=zeros(N,1);
- 
- for k=1:N
-   x=1.61+k*dx;
-   xx(k)=x;
-   %  dd(k)=2*sqrt(1-1./x)+(1-1./x)-x;
-
-    dd(k)=x^4-2*x^3-x^2+2*x+1;
-    if(abs(dd(k))<1e-6)
-    x
-    dd(k)
-    end
- %  dd(k)=sqrt(x-1./x)+sqrt(1-1./x)-x;
-end
- y=1.6185*sqrt(2);
- y
- 
-  figure(5)
- plot(xx,dd,'-r','LineWidth',2);
- 
-
 %filename= 'D:\Works and Studies\Photonic\Lumerical\models\faradary_isolator\results-7-180s-108.txt';
 [filename,filepath]=uigetfile('*.txt', 'Select results file')
 file=strcat(filepath,strcat('\',filename));
