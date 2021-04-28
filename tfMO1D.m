@@ -373,8 +373,6 @@ function [T]=TransferMatrix(eps,gamma,omega,d)
   
   Pn=PropagationMatrix(eps,Q,omega,d);
 
-  D0=DynamicMatrix(1,0,omega);
-
    T=Dn*Pn*inv(Dn);
     
 end
