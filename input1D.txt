@@ -5,9 +5,9 @@
 //The first input parametrer is GEOMETRY which describes the bar cross-section being elliptical or rectangular
 //GEOMETRY =0 indicates eliptical, GEOMETRY =1 is for rectangular
 //GEOMETRY 
-1   1
-.5 .000025
-//0.582e-6  0.2925e-6
+0 0
+//.5 .000025
+0.505e-9  0.505e-9
 //Rx Ry
 //fi  anticlockiwise angle of elipse axis with x-axis.  angle is given in degrees.
 0
@@ -28,8 +28,8 @@
 //EPS_BAR
 //2.2201  2.2201 2.2201 0.0
 //2.1 	2.1 	2.1  	0.0
-//1. 	1.	1. 	0.0
-2.72 	2.72  	2.72  	0.03
+1. 	1.	1. 	0.0
+//2.72 	2.72  	2.72  	0.03
 //5.5 	5.5 	5.5  	0.01
 //N bars *  num defects * start def
 4
@@ -37,8 +37,8 @@
 1 1
 // WN1	WN2 DIVISION
 //1.5 2 40
-.5  2 100
-0 40
+.3  .9 30
+0 10
 //PlotFouriesSeries   Plot3DVectors
 0 0
 

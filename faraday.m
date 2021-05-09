@@ -18,10 +18,6 @@ numbs = str2num(line);
 geometry=numbs(1);
 global fext;
 rec=0;
-fext=-1;
-if(length(numbs)>1 && numbs(2)>0)
-%fext=1;
-end
 fext=1;
 
 
