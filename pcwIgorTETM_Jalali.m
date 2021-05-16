@@ -16,20 +16,22 @@ a=1e-6;
 %a=1.17e-6
 %The variable r contains elements radius. Here it is defined as a part of the period.
 
-r=0.29*a;
+r=0.43*a;
 %r=0.25e-6
 %The variable eps1 contains the information about the relative background material permittivity.
 %Eps1=2.72;
-Eps1=6.25;
+Eps1=4.75;
 
 %The variable eps2 contains the information about permittivity of the elements composing PhC.
-Eps2=1.;
+Eps2=1;
 
 %Variable numElem defines the number of PhC elements
-numElem=1;
+numElem=3;
 
 %Number of holes missed
-numDef=0;
+numDef=1;
+
+nG=3;
 
 %Setting transversal wave vector to a single value
 kx=0;
@@ -41,25 +43,23 @@ if(mode==1)
 end
 
 
-PWE(mode, a, r, Eps1, Eps2, numElem, numDef, kx,color, 2);
-numElem=1;
-numDef=0;
+PWE(nG, mode, a, r, Eps1, Eps2, numElem, numDef, kx,color, 2);
 
 mode=1;
 color='-r';
 
-PWE(mode, a, r, Eps1, Eps2, numElem, numDef, kx,color, 2);
+PWE(nG,mode, a, r, Eps1, Eps2, numElem, numDef, kx,color, 2);
 %Setting transversal wave vector to a range of values within Brillouin zone
 kx=0:(pi/a)/20:pi/a;
 
 
-function PWE(mode, a, r, Eps1, Eps2, numElem,numDefect, kx_param, color, linewidth)
+function PWE(nG, mode, a, r, Eps1, Eps2, numElem,numDefect, kx_param, color, linewidth)
 
 %The variable precis defines the number of k-vector points between high symmetry points
 precis=15;
 %The variable nG defines the number of plane waves.
 %total number of plane waves may be determined as (nG*2-1)^2
-nG=3;
+
 
 %kapth segments 1: gama to X, 2: Gama to M, 3: whole path
 nKpath=3;
@@ -212,12 +212,12 @@ end
      end
 
 
-save('bandsTM.txt', 'result', '-ascii')
+%%save('bandsTM.txt', 'result', '-ascii')
 
 ylabel('Frequency \omegaa/2\pic','FontSize',18);
 xlabel('Propagation constant \beta, m^{-1}','FontSize',18);
 title('The dispersion diagram of the PhC waveguide','FontSize',10)
-axis([1,Nk,0,2]);
+axis([1,Nk,.2,1]);
 
 grid on;
 str={'G','X','M','G'};
