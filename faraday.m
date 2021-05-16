@@ -66,6 +66,7 @@ line=getNewDataLine(fid);
 numbs = str2num(line);
 ndata=length(numbs)
 
+gamab=0;
 epsbx=numbs(1);
 if(ndata>1)
 epsby=numbs(2);
@@ -76,6 +77,7 @@ end
 line=getNewDataLine(fid);
 numbs = str2num(line);
 epsax=numbs(1);
+gamaa=0;
 if(ndata>1)
 epsay=numbs(2);
 epsaz=numbs(3);
@@ -255,7 +257,7 @@ Rx,Ry,d1,d2,Na,nGx,nGy,k1,p,plotFT,plotWave,colorAng,theta,fi,rec)
 
 nk=size(epsb,2);
 
-single_percision=0; % using single or double percison numbers
+single_percision=1; % using single or double percison numbers
 
 d=d1+d2;
 
@@ -282,6 +284,9 @@ dd=Lx1;
 
 
 E0=[0 0 1]';
+if(nk==1)
+E0=[1]';
+end;
 
 
 kx=k1*sind(theta);
@@ -372,7 +377,7 @@ if(p==1)
      MM=  zeros(dimx,dimx);
     end
         
-    bE=zeros(nk*(numG+2*(Lx1)),1);
+    bE=zeros(dimx,1);
     
     countG=0;
            
@@ -636,11 +641,11 @@ for Gx=-nGx:nGx
         if(Gx==0)
                       
             if(k~=2)
-            bN((numG+Gxp-1)*nk+k)= (1i*L*k1y+1)*E0(k);
-            if(k==1)
+             bN((numG+Gxp-1)*nk+k)= (1i*L*k1y+1)*E0(k);
+             if(k==1 && nk!=1)
               bN((numG+Gxpp-1)*nk+k)=-E0(k);
-            else
-               bN((numG+Gxpp-1)*nk+k)=E0(k);
+              else
+              bN((numG+Gxpp-1)*nk+k)=E0(k);
             end
             end
         end
@@ -654,18 +659,45 @@ disp('solving matrix...');
 
   NN=NN+MM;   
 
- 
- sp=0;
-if(sp==1)
- NNs=sparse(NN);
-bNs=sparse(bN);
+%% if(nk==3)
+%% 
+%% bN2=zeros(dimx/3,1);
+%% 
+%%for j=1:dimx/3   
+%%    bN2(j)=bN(3*j);
+%%end
+%%
+%% NN2=zeros(dimx/3,dimx/3);
+%% 
+%%for j=1:dimx/3
+%%  for k=1:dimx/3
+%%    
+%%    NN2(j,k)=NN(3*j,3*k);
+%%end
+%%end
+%% bN2
+%%NN2
+%% x22=linsolve(NN2,bN2);
+%%
+%% x22
+%%
+%%else
+%%bN
+%%NN
+%%end
 
-x=NNs\bNs;
-else
- %
  x=linsolve(NN,bN);
-end
 
+ if(nk==3)
+%% x2=zeros(dimx/3,1);
+%% 
+%%for j=1:dimx/3   
+%%    x2(j)=x(3*j);
+%%end
+%%x2
+else
+%x
+end
 Anm=zeros(2*nGx+1,nGy,nk);
 Tn=zeros(2*nGx+1,nk);
 Tn2=zeros(2*nGx+1,1);
@@ -749,6 +781,7 @@ end
 
 Fr=0;
 
+if(nk>1)
 
 nL=max(int32(L*k1/2/pi)*17*2,35);
 
@@ -930,6 +963,8 @@ if(plotWave)
     %angsHomog=-0.5*y*k1*imag(epsb(1,3))/sqrt(epsb(1,1))*180/pi;
     %plot(y,angsHomog,'-k');
     
+end
+
 end
 
 end
