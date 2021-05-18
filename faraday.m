@@ -191,7 +191,7 @@ end
 t2=cputime;
 
 comptation_time=t2-t1;
-comptation_time;
+comptation_time
 	
 result=zeros(1*cf*ndiv+1,4);
 
@@ -203,7 +203,7 @@ fprintf(fid,'[nGx *  nGy]\n');
   
 fprintf(fid,'%d\t%d\n',nGx,nGy);
 fprintf(fid,'[Fn *  Rotation * Transmitance ]\n');  
-
+gpu
 
   for p=1:1*cf*ndiv+1
   
@@ -407,12 +407,14 @@ if(p==1)
                     sGyp=Ly1+Gy+Gy1;
                     countG1=countG1+1;
                          
-       
+                      if(nk==1) 
                     
-                    Kapas(1:4)=Kapa(dGxp,sGyp,1:4);
-
-
-                                        
+                     KapTenss=[Kapa(dGxp,sGyp,1)];
+              
+                    KapTensd=[Kapa(dGxp,dGyp,1)];                 
+                    else
+                    
+                    Kapas(1:4)=Kapa(dGxp,sGyp,1:4);                                       
                     Kapad(1:4)=Kapa(dGxp,dGyp,1:4);
                     
                     KapTenss=[Kapas(1) 0 1i*Kapas(4); 0 Kapas(2) 0 ;
@@ -421,10 +423,13 @@ if(p==1)
                     
                     KapTensd=[Kapad(1) 0 1i*Kapad(4); 0 Kapad(2) 0 ;
                         -1i*Kapad(4) 0  Kapad(3)];
-
+                    end
                     
-                    W=zeros(3,3);
+                    W=zeros(nk,nk);
                     
+                    if(nk==1)
+                      W(1,1)=kym^2+kxn2;;                    
+                    else
                     
                     W(1,1)=kym^2;
                     W(1,2)=-kxn1*kym;
@@ -433,16 +438,26 @@ if(p==1)
                     
                     W(3,3)=W(1,1)+ W(2,2);
                     
+                    end
+        
+                    
                     Wm=W;
+                     if(nk==3)
                      Wm(1,2)= -W(1,2);
                      Wm(2,1)= -W(2,1);
+                     end
 
                     CA=(KapTensd*W-KapTenss*Wm);
-                    
+                   
                                         
-                   WR=zeros(3,3);
-                   WR(2,2)=kxn2*pph/Gy1;
-                   WR(3,3)=WR(2,2);
+                   WR=zeros(nk,nk);
+                     if(nk==1)
+                      WR(1,1)=kxn2*pph/Gy1;
+                     else
+                      WR(2,2)=kxn2*pph/Gy1;
+                      WR(3,3)=WR(2,2);
+                     end
+
 
 
                    CC=(KapTensd-KapTenss)*WR;
@@ -642,7 +657,7 @@ for Gx=-nGx:nGx
                       
             if(k~=2)
              bN((numG+Gxp-1)*nk+k)= (1i*L*k1y+1)*E0(k);
-             if(k==1 && nk!=1)
+             if(k==1 && nk~=1)
               bN((numG+Gxpp-1)*nk+k)=-E0(k);
               else
               bN((numG+Gxpp-1)*nk+k)=E0(k);
@@ -659,34 +674,15 @@ disp('solving matrix...');
 
   NN=NN+MM;   
 
-%% if(nk==3)
-%% 
-%% bN2=zeros(dimx/3,1);
-%% 
-%%for j=1:dimx/3   
-%%    bN2(j)=bN(3*j);
-%%end
-%%
-%% NN2=zeros(dimx/3,dimx/3);
-%% 
-%%for j=1:dimx/3
-%%  for k=1:dimx/3
-%%    
-%%    NN2(j,k)=NN(3*j,3*k);
-%%end
-%%end
-%% bN2
-%%NN2
-%% x22=linsolve(NN2,bN2);
-%%
-%% x22
-%%
-%%else
-%%bN
-%%NN
-%%end
+gpu=0;
+
+if(gpu>0)
+ gpux=gpuArray(NN)\gpuArray(bN);
+ x=gather(gpux);
+else
 
  x=linsolve(NN,bN);
+ end
 
  if(nk==3)
 %% x2=zeros(dimx/3,1);
