@@ -204,6 +204,7 @@ fprintf(fid,'[nGx *  nGy]\n');
 fprintf(fid,'%d\t%d\n',nGx,nGy);
 fprintf(fid,'[Fn *  Rotation * Transmitance ]\n');  
 
+
   for p=1:1*cf*ndiv+1
   
   result(p,1)= Fn(p);
@@ -254,7 +255,11 @@ end
 function [Ts Rs Fr Tsx]=calculteFaraday(geometry,epsa,epsb,eps1,eps3,a1,a2,...
 Rx,Ry,d1,d2,Na,nGx,nGy,k1,p,plotFT,plotWave,colorAng,theta,fi,rec)
 
-nk=size(epsb,2);
+dmm=size(epsb,2);
+nk=1;
+if(dmm>1)
+nk=2;
+end
 
 single_percision=1; % using single or double percison numbers
 
@@ -282,7 +287,7 @@ numG=(Lx1)*nGy;
 dd=Lx1;
 
 
-E0=[0 0 1]';
+E0=[0 1]';
 if(nk==1)
 E0=[1]';
 end;
@@ -416,12 +421,12 @@ if(p==1)
                     Kapas(1:4)=Kapa(dGxp,sGyp,1:4);                                       
                     Kapad(1:4)=Kapa(dGxp,dGyp,1:4);
                     
-                    KapTenss=[Kapas(1) 0 1i*Kapas(4); 0 Kapas(2) 0 ;
-                        -1i*Kapas(4) 0  Kapas(3)];
+                    KapTenss=[Kapas(1) 1i*Kapas(4); 
+                        -1i*Kapas(4)  Kapas(3)];
 
                     
-                    KapTensd=[Kapad(1) 0 1i*Kapad(4); 0 Kapad(2) 0 ;
-                        -1i*Kapad(4) 0  Kapad(3)];
+                    KapTensd=[Kapad(1) 1i*Kapad(4);
+                        -1i*Kapad(4) Kapad(3)];
                     end
                     
                     W=zeros(nk,nk);
@@ -431,20 +436,12 @@ if(p==1)
                     else
                     
                     W(1,1)=kym^2;
-                    W(1,2)=-kxn1*kym;
-                    W(2,1)= W(1,2);
-                    W(2,2)=kxn2;
-                    
-                    W(3,3)=W(1,1)+ W(2,2);
+                    W(2,2)=kym^2+kxn2;; 
                     
                     end
         
                     
                     Wm=W;
-                     if(nk==3)
-                     Wm(1,2)= -W(1,2);
-                     Wm(2,1)= -W(2,1);
-                     end
 
                     CA=(KapTensd*W-KapTenss*Wm);
                    
@@ -454,7 +451,6 @@ if(p==1)
                       WR(1,1)=kxn2*pph/Gy1;
                      else
                       WR(2,2)=kxn2*pph/Gy1;
-                      WR(3,3)=WR(2,2);
                      end
 
 
@@ -510,26 +506,17 @@ if(p==1)
                 
                 
                 if(Gx==Gx1)
-                    for k=1:nk
-                        if(k~=2)
-                            
-                            MM((Gx1p+numG-1)*nk+k,((Gx1p-1)*nGy+Gy-1)*nk+k)=pi*Gy;
-
-                        end
-                         
+                    for k=1:nk                          
+                            MM((Gx1p+numG-1)*nk+k,((Gx1p-1)*nGy+Gy-1)*nk+k)=pi*Gy;                         
                     end
                     
                     if(mod(Gy,2)==0)
                         for k=1:nk
-                            if(k~=2)
                                 MM((Gx1pp+numG-1)*nk+k,((Gx1p-1)*nGy+Gy-1)*nk+k)=pi*Gy;
-                            end
                         end
                     else
                         for k=1:nk
-                            if(k~=2)
                                 MM((Gx1pp+numG-1)*nk+k,((Gx1p-1)*nGy+Gy-1)*nk+k)=-pi*Gy;
-                            end
                         end
                     end
                     
@@ -634,8 +621,6 @@ for Gx=-nGx:nGx
     
     for k=1:nk
         
-       
-            if(k~=2)
                 NN((numG+Gxp-1)*nk+k,(numG+Gxp-1)*nk+k)=1;
                 
                 
@@ -645,23 +630,16 @@ for Gx=-nGx:nGx
                 NN((numG+Gxpp-1)*nk+k,(numG+Gxp-1)*nk+k)=-(1i*L*ktny-1);
                 
                 NN((numG+Gxpp-1)*nk+k,(numG+Gxpp-1)*nk+k)=-1;
-            else
-                
-                NN((numG+Gxp-1)*nk+k,(numG+Gxp-1)*nk+k)=1.;
-            
-                NN((numG+Gxpp-1)*nk+k,(numG+Gxpp-1)*nk+k)=1.;
-            end
         
         if(Gx==0)
                       
-            if(k~=2)
              bN((numG+Gxp-1)*nk+k)= (1i*L*k1y+1)*E0(k);
              if(k==1 && nk~=1)
               bN((numG+Gxpp-1)*nk+k)=-E0(k);
               else
               bN((numG+Gxpp-1)*nk+k)=E0(k);
             end
-            end
+
         end
     end
 end
@@ -857,8 +835,8 @@ E2(:,:,1);
     for ix=1:Nx
         x=xx(ix);
         Vx=E2(ix,1,1);
-        Vy=E2(ix,1,2);
-        Vz=E2(ix,1,3);
+        Vy=0;
+        Vz=E2(ix,1,2);
         
         
         for k=1:nL
@@ -868,10 +846,10 @@ E2(:,:,1);
             Vx=E2(ix,k,1);
             
             Vyp=Vy;
-            Vy=E2(ix,k,2);
+            Vy=0;
             
             Vzp=Vz;
-            Vz=E2(ix,k,3);
+            Vz=E2(ix,k,2);
             
             
             color = 'r';
@@ -930,12 +908,12 @@ for ix=1:Nx
 end
 
 Ex1_sum=sum(E1(:,1));
-Ez1_sum=sum(E1(:,3));
+Ez1_sum=sum(E1(:,2));
 TM_fract1=abs(Ex1_sum)^2/(abs(Ex1_sum)^2+abs(Ez1_sum)^2);
 ct1=sqrt(TM_fract1);
 angle0=-acos(ct1);
  Ex3_sum=sum(E3(:,1));
-Ez3_sum=sum(E3(:,3));
+Ez3_sum=sum(E3(:,2));
 
 TM_fract=abs(Ex3_sum)^2/(abs(Ex3_sum)^2+abs(Ez3_sum)^2);
    

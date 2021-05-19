@@ -5,9 +5,9 @@
 //The first input parametrer is GEOMETRY which describes the bar cross-section being elliptical or rectangular
 //GEOMETRY =0 indicates eliptical, GEOMETRY =1 is for rectangular
 //GEOMETRY 
-1
-//.504e-9  .504-9
-.5 .25
+0
+.504e-9  .504-9
+//.5 .25
 //Rx Ry
 //fi  anticlockiwise angle of elipse axis with x-axis.  angle is given in degrees.
 0
@@ -22,19 +22,19 @@
 //epsilon of the back ground. The first 3 are the elpsion sin the x , y and z direction and the forth one is the //complex part.
 //EPS_BACKGROUND1. 	
 //1. 	1.	1. 	0.0
-5.5 	5.5	5.5 	0.01
+5.5 5.5	5.5 	0.01
 //epsilon of the bars. The first 3 are the elpsion sin the x , y and z direction and the forth one is the complex //part.
 //EPS_BAR
 1. 	1.	1. 	0.0
 //N bars *  num defects * start def
-2
+20
 //Transmittivity  FaradayRotation
 1	1
 // WN1	WN2 DIVISION
 //.3  .6  10
-1.801801  1.834800   1
+1.801801  1.834800   60
 //1.8181818 1.8181818  0
-0 20
+0 300
 //PlotFouriesSeries   Plot3DVectors
-1 0
+0 0
 

@@ -1,4 +1,4 @@
-function faraday
+function jalali
 
 clear all
 
@@ -268,7 +268,14 @@ global MM;
 global Kapa;
 global bE;
 
-w2c2=(k1)^2;
+w2_c2=(k1)^2;
+
+c=29992458.;
+
+w2=w2_c2*1/mu0*e0;
+w2
+
+wmu0=
 
 L=Na*a2+d;
 
@@ -292,7 +299,7 @@ E0z=1;
 
 kx=k1*sind(theta);
 k1y=k1*cosd(theta);
-k3=sqrt(eps3/eps1*w2c2);
+k3=sqrt(eps3/eps1*w2_c2);
 bx=2*pi/a1;
 
 by=pi/L;
@@ -305,17 +312,17 @@ if(p==1)
     disp('Computing Fourier series ..');
     Kapa=zeros(4*nGx+1,4*nGy+1,4)+1i*zeros(4*nGx+1,4*nGy+1,4);
     if(triang)
-        FillKapaTriang(nGx,nGy,epsa,epsb,L,R,Na,a1,a2);  %triangular
+       % FillKapaTriang(nGx,nGy,epsa,epsb,L,R,Na,a1,a2);  %triangular
         %lattivce not implemented properly.
     elseif (geometry==0)
-        FillKapaCylinderAntiSymDef(nGx,nGy,epsa,epsb,L,Rx,Ry,Na,a1,a2,d1,fi); 
+        FillKapaCylinderSymDef(nGx,nGy,epsa,epsb,L,Rx,Ry,Na,a1,a2,d1,fi); 
 
     else
     if(geometry==1 && rec==1)
-    FillKapaRectangleAntiSym(nGx,nGy,epsa,epsb,L,Rx,Ry,Na,a1,a2,d1,fi);
+   % FillKapaRectangleSym(nGx,nGy,epsa,epsb,L,Rx,Ry,Na,a1,a2,d1,fi);
 
   else
-       FillKapaAntiSymNum(geometry,nGx,nGy,epsa,epsb,L,Rx,Ry,Na,a1,a2,d1,fi);
+    %   FillKapaSymNum(geometry,nGx,nGy,epsa,epsb,L,Rx,Ry,Na,a1,a2,d1,fi);
  end
  end
 
@@ -557,25 +564,25 @@ for Gx=-nGx:nGx
         
         c3=(numG+Gxpp-1)+1;
            
-           NN(r1,c1)= w2c2;
+           NN(r1,c1)= w2_c2;
              
            
-           NN(r1+dimx/2,c1+dimx/2)= w2c2; %%%  ??? should be 1.0 temporary
+           NN(r1+dimx/2,c1+dimx/2)= w2_c2; %%%  ??? should be 1.0 temporary
 
         
         if(mod(Gy,2)==0)
 
-              NN(r1,c2)=-pph/Gy*w2c2;
+              NN(r1,c2)=-pph/Gy*w2_c2;
         else
   
-               NN(r1,c2)=pph/Gy*w2c2;
+               NN(r1,c2)=pph/Gy*w2_c2;
         end
         
         if(r1==c2)
          NN(r1+dimx/2,c2+dimx/2)=1;
         end
 
-               NN(r1,c3)=pph/Gy*w2c2;
+               NN(r1,c3)=pph/Gy*w2_c2;
                
           if(r1==c3)
          NN(r1+dimx/2,c3+dimx/2)=1;
@@ -583,7 +590,7 @@ for Gx=-nGx:nGx
       
             if(Gx==0)
                 
-                bN(r1)=-pph/Gy*w2c2*E0z;
+                bN(r1)=-pph/Gy*w2_c2*E0z;
                 
             end
        
@@ -957,29 +964,28 @@ end
 end
 
 
-function FillKapaCylinderAntiSymDef(nGx,nGy,epsa,epsb,L,Rx,Ry,Na,a1,a2,d1,fi)
+function FillKapaCylinderSymDef(nGx,nGy,epsa,epsb,L,Rx,Ry,Na,a1,a2,d1,fi)
 global Kapa;
 
 global fext;
 
-disp('anti-sym Defect');
+%disp('anti-sym Defect');
 fext
 nk=4;
 if(length(epsa)==1)
 nk=1;
 end
 
-invepsa1=inv(epsa);
-invepsb1=inv(epsb);
-
 if(nk==1)
 
-invepsa=[invepsa1(1,1)];
-invepsb=[invepsb1(1,1)];
+invepsa=1/epsa(1,1);
+invepsb=1/epsb(1,1);
 
 else
-invepsa=[invepsa1(1,1)  invepsa1(2,2) invepsa1(3,3) imag(invepsa1(1,3))];
-invepsb=[invepsb1(1,1) invepsb1(2,2) invepsb1(3,3)  imag(invepsb1(1,3))];
+gma=imag(epsa(1,3));
+invepsa=[1/epsa(1,1)  1/epsa(3,3) gma/epsa(1,1)  gma/(epsa(1,1)^2)];
+gmb=imag(epsb(1,3));
+invepsb=[1/epsb(1,1)  1/epsb(3,3) gmb/epsb(1,1)  gmb/(epsb(1,1)^2)];
 
 end
 
@@ -1169,341 +1175,6 @@ twindle=twindle1+twindle2;
 
 end
 
-function FillKapaCylinderAntiSym(nGx,nGy,epsa,epsb,L,R,Na,a1,a2,d1)
-global Kapa;
-
-disp('anti-sym');
-nk=4;
-if(length(epsa)==1)
-nk=1;
-end
-
-invepsa1=inv(epsa);
-invepsb1=inv(epsb);
-
-if(nk==1)
-
-invepsa=[invepsa1(1,1)];
-invepsb=[invepsb1(1,1)];
-
-else
-invepsa=[invepsa1(1,1)  invepsa1(2,2) invepsa1(3,3) imag(invepsa1(1,3))];
-invepsb=[invepsb1(1,1) invepsb1(2,2) invepsb1(3,3)  imag(invepsb1(1,3))];
-
-end
-
-ff=Na*pi*R*R/(a1*L);
-d11=d1/L;
-
-for dGx=-2*nGx:2*nGx
-    Gn=2*pi*dGx/a1;
-    for dGy=-2*nGy:2*nGy
-        Gm=dGy*pi/L;
-        GnmR=sqrt(Gn*Gn+Gm*Gm)*R;
-        dGxp=dGx+1+2*nGx;
-        dGyp=dGy+1+2*nGy;
-        
-        if(dGx==0&& dGy==0)
-          for k=1:nk
-              if(k~=4)
-             Kapa(dGxp,dGyp,k)=1*(ff*invepsa(k)+(1-ff)*invepsb(k))+...
-             2*d11*(invepsa(k)-invepsb(k));
-          
-          end
-              
-            end
-            
-        elseif(dGy==0)
-            tt=2*ff*besselj(1,GnmR)/GnmR;
-            
-            for k=1:nk
-                if(k~=4)
-                    Kapa(dGxp,dGyp,k)=tt*(invepsa(k)-invepsb(k));
-                end
-            end
-            
-        else
-            tt=a2*dGy*pi/(2*L);
-            
-            
-            for k=1:nk
-                if(k==4)
-                    factm=-1i*sin(dGy*pi/2)*sin(Na*tt)/sin(tt)/Na;
-                    vv=2*ff*besselj(1,GnmR)/GnmR;
-                    
-                    Kapa(dGxp,dGyp,k)=1*factm*vv*(invepsa(k)-invepsb(k));
-                    if(dGx==0)
-                        vvL=2*sin(dGy*pi*.5*(L-2*d1)/L)/(dGy*pi);
-                        factm=-1i*sin(dGy*pi*.5);
-                        
-                       Kapa(dGxp,dGyp,k)=Kapa(dGxp,dGyp,k)+factm*vvL*invepsb(k);
-                    end
-                else
-                    factm=cos(dGy*pi/2)*sin(Na*tt)/sin(tt)/Na;
-                    vv=2*ff*factm*besselj(1,GnmR)/GnmR;
-                    
-                    Kapa(dGxp,dGyp,k)=1*vv*(invepsa(k)-invepsb(k));
-                end
-                
-                
-                if(dGx==0 && d11>0 && k~=4)
-                    aa= pi*dGy*d11;
-                    
-               zz=1*sin(aa)/aa*d11+2*cos(pi*dGy*(L-d1/2)/L)*sin(aa/2)/aa*d11;
-               Kapa(dGxp,dGyp,k)= Kapa(dGxp,dGyp,k)+zz*(invepsa(k)-invepsb(k));
-                end
-                
-            end
-            
-        end
-        
-        
-    end
-end
-end
-
-
-
-function FillKapaRectangleAntiSym(nGx,nGy,epsa,epsb,L,Rx,Ry,Na,a1,a2,d1,fi)
-global Kapa;
-
-disp('rectangle anti-sym');
-nk=4;
-if(length(epsa)==1)
-nk=1;
-end
-
-invepsa1=inv(epsa);
-invepsb1=inv(epsb);
-
-if(nk==1)
-
-invepsa=[invepsa1(1,1)];
-invepsb=[invepsb1(1,1)];
-
-else
-invepsa=[invepsa1(1,1)  invepsa1(2,2) invepsa1(3,3) imag(invepsa1(1,3))];
-invepsb=[invepsb1(1,1) invepsb1(2,2) invepsb1(3,3)  imag(invepsb1(1,3))];
-
-end
-
-cell_size=a1*a2*Na*2;
-rect_size=2*Rx*2*Ry;
-
-fillx=2*Rx/a1;
-filly=2*Ry/a2;
-
-bx=2*pi/a1;
-by=pi/L;
-
-
-KapaUnit=zeros(1,4*nGy+1,4)+1i*zeros(1,4*nGy+1,4);
-
-
-
-for dGx=-2*nGx:2*nGx
-      dGxp=dGx+1+2*nGx;
-   ttx=dGx*bx*Rx;
-   for dGy=-2*nGy:2*nGy
-        
-        tty=dGy*by*Ry;
-     
-        dGyp=dGy+1+2*nGy;
-        
-  for k=1:nk
-      if(dGx==0)
-       four_coefx= (invepsb(k)+fillx*(invepsa(k)-invepsb(k)));
-        else
-          four_coefx=(invepsa(k)-invepsb(k))*2*Rx/(a1)*sin(ttx)/(ttx);
-       end
-        
-         if(dGy==0)
-       four_coefy= (invepsb(k)+filly*(invepsa(k)-invepsb(k)))/(2*Na);
-        else
-          four_coefy=(invepsa(k)-invepsb(k))*2*Ry/(a1)*sin(tty)/(tty)/(2*Na);
-       end
-      
-       
-        KapaUnit(dGxp,dGyp,k)=four_coefx*four_coefy;
-
-
-  end
-
-end
-
-end
-
-Kapa=zeros(4*nGx+1,4*nGy+1,4)+1i*zeros(4*nGx+1,4*nGy+1,4);
-
-
-global ndef;
-global defstart;
-
-by=pi/L;
-
-
-KapaDefect=zeros(1,4*nGy+1,4)+1i*zeros(1,4*nGy+1,4);
- 
-
-
-if(ndef>0)
-
-     for dGy=-2*nGy:2*nGy
-        
-        dGyp=dGy+1+2*nGy;
-
-        tt=dGy*by*a2/2;
-          
-          for k=1:nk
-                if(dGy==0)
-                  KapaDefect(1,dGyp,k)=invepsb(k)*a2/(2*L);
-                else
-                  KapaDefect(1,dGyp,k)=invepsb(k)*a2/(2*L)*sin(tt)/(tt);
-             end
-         
-         end
-    
-        
-    end
- 
-end
- 
-
-Kapa=zeros(4*nGx+1,4*nGy+1,4)+1i*zeros(4*nGx+1,4*nGy+1,4);
-
-ndef
-defstart
-
-defcount=0;
-isDef=zeros(2*Na,1);
-for n=0:Na-1 
-  np=n+Na+1;
- if(n+1>=defstart && defcount<ndef)
- defcount=defcount+1;
- isDef(np,1)=1;
- isDef(Na-n,1)=1;
- end
-end
-
- dGxp=1+2*nGx;
-
-
-by=pi/L;
-
-for n=-Na:Na-1 
- np=n+Na+1;
-
- for dGy=-2*nGy:2*nGy
-       
-      dGyp=dGy+1+2*nGy;
-        twindle=exp(-1i*(n+.5)*by*dGy*a2);
-     if(isDef(np,1))
-
-    for k=1:nk
-       if(k~=4 || n>=0)
-       Kapa(dGxp,dGyp,k)=  Kapa(dGxp,dGyp,k)+KapaDefect(1,dGyp,k)*twindle;
-        else
-       Kapa(dGxp,dGyp,k)=  Kapa(dGxp,dGyp,k)+KapaDefect(1,dGyp,k)*twindle;
-        end
-     end
-   else
-     for k=1:nk
-       if(k~=4 || n>=0)
-         Kapa(:,dGyp,k)=Kapa(:,dGyp,k)+KapaUnit(:,dGyp,k)*twindle;
-        else
-         Kapa(:,dGyp,k)=Kapa(:,dGyp,k)+KapaUnit(:,dGyp,k)*twindle;
-        end
-     end
-   
-   end
-        
-        
-    end
-  end
-  
-end
-
-
-
-function FillKapaCylinderSym(nGx,nGy,epsa,epsb,L,R,Na,a1,a2,d1)
-global Kapa;
-
-
-
-disp('sym');
-nk=4;
-if(length(epsa)==1)
-nk=1;
-end
-
-invepsa1=inv(epsa);
-invepsb1=inv(epsb);
-
-if(nk==1)
-
-invepsa=[invepsa1(1,1)];
-invepsb=[invepsb1(1,1)];
-
-else
-invepsa=[invepsa1(1,1)  invepsa1(2,2) invepsa1(3,3) imag(invepsa1(1,3))];
-invepsb=[invepsb1(1,1) invepsb1(2,2) invepsb1(3,3)  imag(invepsb1(1,3))];
-
-end
-
-ff=Na*pi*R*R/(a1*L);
-d11=d1/L;
-
-for dGx=-2*nGx:2*nGx
-    Gn=2*pi*dGx/a1;
-    for dGy=-2*nGy:2*nGy
-        Gm=dGy*pi/L;
-        GnmR=sqrt(Gn*Gn+Gm*Gm)*R;
-        dGxp=dGx+1+2*nGx;
-        dGyp=dGy+1+2*nGy;
-        
-        if(dGx==0&& dGy==0)
-            for k=1:nk
-           Kapa(dGxp,dGyp,k)=1*(ff*invepsa(k)+(1-ff)*invepsb(k))+...
-           2*d11*(invepsa(k)-invepsb(k));
-                
-            end
-            
-        elseif(dGy==0)
-            tt=2*ff*besselj(1,GnmR)/GnmR;
-            
-            for k=1:nk
-                    Kapa(dGxp,dGyp,k)=tt*(invepsa(k)-invepsb(k));
-            end
-            
-        else
-            tt=a2*dGy*pi/(2*L);
-            
-            
-            for k=1:nk
-
-                    factm=cos(dGy*pi/2)*sin(Na*tt)/sin(tt)/Na;
-                    vv=2*ff*factm*besselj(1,GnmR)/GnmR;
-                    
-                    Kapa(dGxp,dGyp,k)=1*vv*(invepsa(k)-invepsb(k));
-
-                
-                if(dGx==0 && d11>0 )
-                    aa= pi*dGy*d11;
-                    
-               zz=1*sin(aa)/aa*d11+2*cos(pi*dGy*(L-d1/2)/L)*sin(aa/2)/aa*d11;
-               Kapa(dGxp,dGyp,k)= Kapa(dGxp,dGyp,k)+zz*(invepsa(k)-invepsb(k));
-                end
-                
-            end
-            
-        end
-        
-        
-    end
-end
-end
-
-
 
 function line=getNewDataLine(fid)
 
@@ -1612,255 +1283,3 @@ h=surf(X1,Y1,Z1,'facecolor',colr,'edgecolor','none');
 light('Color','r')
 
 end
-
-
-function FillKapaAntiSymNum(geometry,nGx,nGy,epsa,epsb,L,Rx,Ry,Na,a1,a2,d1,fi)
-
-global fext;
-
-disp('Numerical anti-sym');
-nk=4;
-if(length(epsa)==1)
-nk=1;
-end
-
-invepsa1=inv(epsa);
-invepsb1=inv(epsb);
-
-if(nk==1)
-
-invepsa=[invepsa1(1,1)];
-invepsb=[invepsb1(1,1)];
-
-else
-invepsa=[invepsa1(1,1)  invepsa1(2,2) invepsa1(3,3) imag(invepsa1(1,3))];
-invepsb=[invepsb1(1,1) invepsb1(2,2) invepsb1(3,3)  imag(invepsb1(1,3))];
-
-end
-
-global Kapa;
-
- Kapa=zeros(4*nGx+1,4*nGy+1,4)+1i*zeros(4*nGx+1,4*nGy+1,4);
-
-
-ngridx=40;
-if(nGx==0) 
-ngridx=2;
-end
-ngridy=40;
-if(nGy<2) 
-ngridy=2;
-end
-
-invep=zeros(ngridx,ngridy,nk);
-rotMat=[cosd(fi) sind(fi);-sind(fi) cosd(fi)];
-
-
-xyr=[0  0]';
-%The following loop carries out the definition of the unit cell.
-
-    nx=1;
-    for countX=-a1/2:a1/ngridx:a1/2
-        ny=1;
-        for countY=-a2/2:a2/ngridy:a2/2
-            %Following condition allows to define the circle with of radius r
-			xy=[countX countY]';
-			xyr=rotMat*xy;
-			countXr=xyr(1);
-           	countYr=xyr(2);
-				
-            if(geometry==0)
-                inside=(countXr/Rx)^2+(countYr/Ry)^2<1;
-            else
-                 inside =false;
-                  if(Rx>0 && Ry>0) 
-                     inside=abs(countXr/Rx)<=1 && abs(countYr/Ry)<=1;
-                  end
-            end
-            
-            if(inside)
-                
-                ip=invepsa;
-
-            else
-                
-                ip=invepsb;
- 
-            end
-            
-            
-            
-            for k=1:nk
-                inveps(nx,ny,k)=ip(k);
-            end
-            
-            xSet(nx)=countX;
-            ySet(ny)=countY;
-            ny=ny+1;
-        end
-        nx=nx+1;
-    end
-
-
-
-MtNt=(length(xSet)-1)*(length(ySet)-1)*2*Na;
-%The next loop computes the Fourier expansion coefficients
-bx=2*pi/a1;
-
-by=pi/L;
-
-KapaUnit=zeros(4*nGx+1,4*nGy+1,4)+1i*zeros(4*nGx+1,4*nGy+1,4);
- 
-for dGx=-2*nGx:2*nGx
-    
-    for dGy=-2*nGy:2*nGy
-        
-        
-        dGxp=dGx+1+2*nGx;
-        dGyp=dGy+1+2*nGy;
-        
-        for nx=1:length(xSet)-1
-            for ny=1:length(ySet)-1
-                x=xSet(nx);
-                y=ySet(ny);
-                tt=dGx*bx*x+dGy*by*y;
-           
-            for k=1:nk
-      KapaUnit(dGxp,dGyp,k)=KapaUnit(dGxp,dGyp,k)+inveps(nx,ny,k)*exp(-1i*(tt));
-            end
-          end
-        end
-        
-        
-    end
-end
-
-KapaUnit=  KapaUnit/MtNt;
-
-
-global ndef;
-global defstart;
-
-KapaDefect=zeros(1,4*nGy+1,4)+1i*zeros(1,4*nGy+1,4);
- 
-
-if(ndef>0)
- 
-     for dGy=-2*nGy:2*nGy
-        
-        dGyp=dGy+1+2*nGy;
-
-        tt=dGy*by*a2/2;
-          
-          for k=1:nk
-                if(dGy==0)
-                  KapaDefect(1,dGyp,k)=invepsb(k)*a2/(2*L);
-                else
-                  KapaDefect(1,dGyp,k)=invepsb(k)*a2/(2*L)*sin(tt)/(tt);
-             end
-         
-         end
-    
-        
-    end
- 
-end
-
-
-ndef
-defstart
-
-defcount=0;
-isDef=zeros(2*Na,1);
-for n=0:Na-1 
-  np=n+Na+1;
- if(n+1>=defstart && defcount<ndef)
- defcount=defcount+1;
- isDef(np,1)=1;
- isDef(Na-n,1)=1;
- end
-end
-
- dGxp=1+2*nGx;
-
-
-by=pi/L;
-for n=-Na:Na-1 
- np=n+Na+1;
-
- for dGy=-2*nGy:2*nGy
-       
-      dGyp=dGy+1+2*nGy;
-        twindle=exp(-1i*(n+.5)*by*dGy*a2);
-   if(isDef(np,1))
-    for k=1:nk
-       if(k~=4 || n>=0)
-       Kapa(dGxp,dGyp,k)=  Kapa(dGxp,dGyp,k)+KapaDefect(1,dGyp,k)*twindle;
-        else
-       Kapa(dGxp,dGyp,k)=  Kapa(dGxp,dGyp,k)+fext*KapaDefect(1,dGyp,k)*twindle;
-        end
-     end
-   else
-     for k=1:nk
-       if(k~=4 || n>=0)
-         Kapa(:,dGyp,k)=Kapa(:,dGyp,k)+KapaUnit(:,dGyp,k)*twindle;
-        else
-         Kapa(:,dGyp,k)=Kapa(:,dGyp,k)+fext*KapaUnit(:,dGyp,k)*twindle;
-        end
-     end
-   
-   end
-        
-        
-        
-    end
-
-end
-
-
-if(d1>0)
- KappaEnds=zeros(1,4*nGy+1,4)+1i*zeros(1,4*nGy+1,4);
-
-     for dGy=-2*nGy:2*nGy
-        
-        dGyp=dGy+1+2*nGy;
-
-        tt=dGy*by*d1/2;
-          
-          for k=1:nk
-                if(dGy==0)
-                  KappaEnds(1,dGyp,k)=invepsb(k)*d1/(2*L);
-                else
-                  KappaEnds(1,dGyp,k)=invepsb(k)*d1/(2*L)*sin(tt)/(tt);
-               end
-         
-         end
-    
-        
-    end
- 
-end
-
-  if(d1>0)
-  
-   for dGy=-2*nGy:2*nGy
-       
-      dGyp=dGy+1+2*nGy;
-        twindle1=exp(-1i*(d1/2)*by*dGy)+exp(-1i*(L-d1/2)*by*dGy);
-        twindle2=exp(1i*(d1/2)*by*dGy)+exp(1i*(L-d1/2)*by*dGy);
-twindle=twindle1+twindle2;
-
-     for k=1:nk
-         Kapa(dGxp,dGyp,k)=Kapa(dGxp,dGyp,k)+KappaEnds(1,dGyp,k)*twindle;
-     end
-           
-    
-  end
- 
-  end
-
-
- 
-
-end
-
