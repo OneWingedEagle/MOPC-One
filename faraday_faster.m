@@ -33,10 +33,10 @@ Rx=numbs(1);
 Ry=numbs(2);
 
 
-cryst_const=1;
-if(length(numbs)>2)
-cryst_const=numbs(3);
-end
+%cryst_const=1;
+%if(length(numbs)>2)
+%cryst_const=numbs(3);
+%end
 
 
 line=getNewDataLine(fid);
@@ -54,16 +54,16 @@ end
 
 line=getNewDataLine(fid);
 numbs = str2num(line);
-factor1=numbs(1);
-factor2=numbs(2);
+a1=numbs(1);
+a2=numbs(2);
 
 d1=0;
 if(length(numbs)>2)
 d1=numbs(3);
 end
 
-a1=cryst_const*factor1;
-a2=cryst_const*factor2;
+%a1=cryst_const*factor1;
+%a2=cryst_const*factor2;
 
 d2=d1;
 
@@ -169,7 +169,6 @@ Fr_hom=zeros(1*cf*ndiv+1,1);
 
 a1
 a2
-cryst_const
 
 for p=1:1*cf*ndiv+1
       
@@ -179,11 +178,11 @@ for p=1:1*cf*ndiv+1
    % theta=p;
 
     wn=Fn(p);
-    if(cryst_const==1)
-        k1=sqrt(eps1)*2*pi*wn/a2;
-    else
-        k1=sqrt(eps1)*2*pi*wn/cryst_const;
-    end
+   % if(cryst_const==1)
+     k1=sqrt(eps1)*2*pi*wn/a2;
+  %  else
+  %      k1=sqrt(eps1)*2*pi*wn/cryst_const;
+ %   end
      Fr_hom(p)=-180*gamab/sqrt(epsbx)*Na*wn;
 
      Fn(p)=Fn1+dFn*(p-1);
