@@ -1,4 +1,4 @@
-function faraday
+function faraday_faster
 
 clear all
 
@@ -32,6 +32,13 @@ numbs = str2num(line);
 Rx=numbs(1);
 Ry=numbs(2);
 
+
+cryst_const=1;
+if(length(numbs)>2)
+cryst_const=numbs(3);
+end
+
+
 line=getNewDataLine(fid);
 numbs = str2num(line);
 fi=numbs(1);
@@ -47,13 +54,16 @@ end
 
 line=getNewDataLine(fid);
 numbs = str2num(line);
-ax=numbs(1);
-ay=numbs(2);
+factor1=numbs(1);
+factor2=numbs(2);
 
 d1=0;
 if(length(numbs)>2)
 d1=numbs(3);
 end
+
+a1=cryst_const*factor1;
+a2=cryst_const*factor2;
 
 d2=d1;
 
@@ -157,6 +167,9 @@ cf=(plotWave==0);
 
 Fr_hom=zeros(1*cf*ndiv+1,1);
 
+a1
+a2
+cryst_const
 
 for p=1:1*cf*ndiv+1
       
@@ -166,13 +179,17 @@ for p=1:1*cf*ndiv+1
    % theta=p;
 
     wn=Fn(p);
-    k1=sqrt(eps1)*2*pi*wn/ay;
+    if(cryst_const==1)
+        k1=sqrt(eps1)*2*pi*wn/a2;
+    else
+        k1=sqrt(eps1)*2*pi*wn/cryst_const;
+    end
      Fr_hom(p)=-180*gamab/sqrt(epsbx)*Na*wn;
 
      Fn(p)=Fn1+dFn*(p-1);
      pp=p;
     %  Fn(p)=theta;
-    [Ts Rs,Fr, Tsx]=calculteFaraday(geometry,epsa,epsb,eps1,eps3,ax,ay,Rx,Ry,d1,d2,Na,nGx,nGy,k1,pp,plotFT,plotWave,colR,theta,fi,rec);
+    [Ts Rs,Fr, Tsx]=calculteFaraday(geometry,epsa,epsb,eps1,eps3,a1,a2,Rx,Ry,d1,d2,Na,nGx,nGy,k1,pp,plotFT,plotWave,colR,theta,fi,rec);
            
       if(real(Ts)>1) 
       %  Ts=1;
@@ -229,7 +246,7 @@ if(rotation &&length(FR)>1)
                 figure(1)
              plot(Fn,FR,colR);
              
-              axis([Fn1,Fn2,0,1.1*max(FR)]);
+              axis([Fn1,Fn2,-90,0]);
 
             % axis([Fn1,Fn2,-90,90]);
              hold on
@@ -661,16 +678,7 @@ else
  x=linsolve(NN,bN);
  end
 
- if(nk==3)
-%% x2=zeros(dimx/3,1);
-%% 
-%%for j=1:dimx/3   
-%%    x2(j)=x(3*j);
-%%end
-%%x2
-else
-%x
-end
+
 Anm=zeros(2*nGx+1,nGy,nk);
 Tn=zeros(2*nGx+1,nk);
 Tn2=zeros(2*nGx+1,1);
@@ -705,7 +713,7 @@ for Gx=-nGx:nGx
         
         Rn(k+1,j)=x(kpp+k*nk+j);
         
-        if(j==1)
+        if(j==1 && nk>1)
          Tn2x(k+1)= Tn2x(k+1)+Tn(k+1,j)*conj(Tn(k+1,j));
         end
         Tn2(k+1)= Tn2(k+1)+Tn(k+1,j)*conj(Tn(k+1,j));
@@ -722,6 +730,8 @@ Tsx=0;
 
 Rs=0;
 
+Ts0=0;
+Tsx0=0;
 for Gx=-nGx:nGx
     k=nGx+1+Gx;
     kxn1=1*kx+Gx*bx;
@@ -745,6 +755,10 @@ for Gx=-nGx:nGx
         %Ts=Ts+ktny/k3*sqrt(eps3/eps1)*abs(Tn(k,3))^2/cos(thetad);
     Tsx=Tsx+ktny/k3*sqrt(eps3/eps1)*Tn2x(k)/cosd(theta);
 
+    if(Gx==0)
+        Ts0=ktny/k3*sqrt(eps3/eps1)*Tn2(k)/cosd(theta);
+        Tsx0=ktny/k3*sqrt(eps3/eps1)*Tn2x(k)/cosd(theta);
+    end
     
     Rs=Rs+abs(krny)/k1*Rn2(k)/cosd(theta);
 end
@@ -756,173 +770,14 @@ Fr=0;
 
 if(nk>1)
 
-nL=max(int32(L*k1/2/pi)*17*2,35);
-
-
-
-yy=linspace(0,L,nL);
-
-
-if(plotWave)
-
-Nx=1;
-
-if(Nx==1)
-    xx=zeros(1,1);
-else
-    xx=linspace(-a1/2,a1/2,Nx);
-end
-
-phi=zeros(Nx,nL,nk);
-psi=zeros(Nx,nL,nk);
-
-for ix=1:Nx
-    
-    x=xx(ix);
-    
-    for k=1:nL
-        y=yy(k);
-        
-        for Gx=-nGx:nGx
-            
-            kxn=1*kx+Gx*bx;
-            
-            Gxp=nGx+1+Gx;
-            if(Gx==0)
-            del=1;
-          else 
-            del=0;
-            end
-            for Gy=1:nGy
-                for j=1:nk
-
-		 ky0=Gy*by;
-       
-                    psi(ix,k,j)=psi(ix,k,j)+Anm(Gxp,Gy,j)*sin(ky0*y)*exp(1i*kxn*x);
-                end
-            end
-            for j=1:nk
-                phi(ix,k,j)=phi(ix,k,j)+y/L*Tn(Gxp,j)*exp(1i*kxn*x)+(1-y/L)*(Rn(Gxp,j)+del*E0(j))*exp(1i*kxn*x);
-            end
-        end
-        
-    end
-end
-
-
-E1=phi+psi;
-
-E2=abs(E1);
-E2(:,:,1);
-
-%writeMeshAndField(Nx,nL,1,E2,2,Na);
-
-
-    figure(5)
-    
-    set(gca,'DataAspectRatio',[1 1 1]);
-    axis([-2 2 0 L -2 2]);
-    az = 40;
-    el = 30;
-    %  az=90;
-    %  el=0;
-    view(az, el);
-    
-    
-    
-    hold on
-    
-    for ix=1:Nx
-        x=xx(ix);
-        Vx=E2(ix,1,1);
-        Vy=0;
-        Vz=E2(ix,1,2);
-        
-        
-        for k=1:nL
-            
-            y=yy(k);
-            Vxp=Vx;
-            Vx=E2(ix,k,1);
-            
-            Vyp=Vy;
-            Vy=0;
-            
-            Vzp=Vz;
-            Vz=E2(ix,k,2);
-            
-            
-            color = 'r';
-            
-            
-            if(k>1)
-                h1(k)=plot3([Vxp+x Vx+x],[Vyp+yy(k-1) Vy+y],[Vzp Vz],'LineWidth',2,'Color','b');
-                h2(k)= plot3([-Vxp+x -Vx+x],[yy(k-1) y],[-Vzp -Vz],'LineWidth',2,'Color','b');
-                h3= plot3([0 0],[0 L],[0 0],'LineWidth',2,'Color','k');
-                
-                
-            end
-            
-            
-            arrow1(k) = arrow3d([x x+Vx],[y y+Vy],[0 Vz],.92,.01,.02,color);
-            arrow1(k) = arrow3d([x x-Vx],[y y-Vy],[0 -Vz],.92,.01,.02,color);
-            
-            
-            
-        end
-        
-    end;
-end
-
-
-Nx=10;
-
-if(Nx==1)
-    xx=zeros(1,1);
-else
-    xx=linspace(-a1/2,a1/2,Nx);
-end
-
-E3=zeros(Nx,nk);
-E1=zeros(Nx,nk);
-
-for ix=1:Nx
-    
-    E1(ix,:)=E0(:);
-    
-    x=xx(ix);
-    
-        
-        for Gx=-nGx:nGx
-            
-            kxn=1*kx+Gx*bx;
-            
-            Gxp=nGx+1+Gx;
-           
-            for j=1:nk
-                E3(ix,j)=E3(ix,j)+Tn(Gxp,j)*exp(1i*kxn*x);
-                 E1(ix,j)=E1(ix,j)+Rn(Gxp,j)*exp(1i*kxn*x);
-            end
-        end
-
-end
-
-Ex1_sum=sum(E1(:,1));
-Ez1_sum=sum(E1(:,2));
-TM_fract1=abs(Ex1_sum)^2/(abs(Ex1_sum)^2+abs(Ez1_sum)^2);
-ct1=sqrt(TM_fract1);
-angle0=-acos(ct1);
- Ex3_sum=sum(E3(:,1));
-Ez3_sum=sum(E3(:,2));
-
-TM_fract=abs(Ex3_sum)^2/(abs(Ex3_sum)^2+abs(Ez3_sum)^2);
    
+ TM_fract=abs(Tsx0/Ts0);
 ct=sqrt(TM_fract);
-   
- angle=-acos(ct);
 
-Fr=90+(angle)*180/pi;
-Fr0=90+(angle0)*180/pi;
+angle=asin(ct);
+
+Fr=-(angle)*180/pi;
+
 
 %%%%Fr=(Fr-Fr0);
 
