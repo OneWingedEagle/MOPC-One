@@ -4,24 +4,26 @@ function charter
 [filename,filepath]=uigetfile('*.txt', 'Select results file')
 file=strcat(filepath,strcat('\',filename));
 data0=csvread(file,3,0);
-data0
+data0;
 
-[filename1,filepath1]=uigetfile('*.txt', 'Select results file')
-file1=strcat(filepath1,strcat('\',filename1));
-data1=csvread(file1,3,0);
+%[filename1,filepath1]=uigetfile('*.txt', 'Select results file')
+%file1=strcat(filepath1,strcat('\',filename1));
+%data1=csvread(file1,3,0);
      
 
 data=data0;
 
 ndata=size(data(:,1),1);
 
-reverse=0;
+reverse=1;
 if(reverse==1)
 for j=1:ndata
 data(j,1)=1./data0(ndata-j+1,1);
 data(j,2)=data0(ndata-j+1,2);
 data(j,3)=data0(ndata-j+1,3);
 end
+
+data
 
 fid = fopen('results_lam.txt','wt');  % Note the 'wt' for writing in text mode
 

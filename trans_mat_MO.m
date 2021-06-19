@@ -2,7 +2,8 @@ function trans_mat_MO
 
 clear all
 
-colors = {'-or', '-ob', '-oc', '-ok','-*r', '-*b', '-*c', '-*k','-xr', '-xb', '-xc', '-xk'};
+colors = {'-or', '-ob', '-oc', '-ok','-*r', '-*b', '-*c', '-*k','-xr', '-xb',... 
+'-r', '-b', '-c', '-k','-g'};
 
 [filename1,filepath1]=uigetfile('*.txt', 'Selectinput file')
  cd(filepath1)
@@ -240,8 +241,17 @@ if(rotation &&length(Tr)>1)
                 figure(1)
              plot(Fn,Tr,colR);
              
- 
-             axis([wn1,wn2,0,40]);
+             hmax=50;
+             
+             ttmax=max(Tr);    
+            if(ttmax>45) 
+             div= round(ttmax/5);
+            
+             hmax=(div+1)*5;
+             
+             end
+           
+             axis([wn1,wn2,0,hmax]);
              hold on
              
         %   plot(Fn,Fr_hom,'+k');
