@@ -1,5 +1,15 @@
 function convert_to_lambda
 
+h=2;
+a=0.02;
+r=1;
+g=9.81;
+
+T=sqrt(2*h/g)*(r/a)^2;
+T
+T=T/60;
+T
+
 %filename= 'D:\Works and Studies\Photonic\Lumerical\models\faradary_isolator\results-7-180s-108.txt';
 %[filename,filepath]=uigetfile('*.txt', 'Select results file')
 %file=strcat(filepath,strcat('\',filename));

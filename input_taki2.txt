@@ -6,8 +6,8 @@
 //GEOMETRY =0 indicates eliptical, GEOMETRY =1 is for rectangular
 //GEOMETRY 
 0   
-// Rx  Ry  a
-.504 .504  1.17
+// Rx  Ry  
+.504 .48  
 //Rx Ry
 //fi  anticlockiwise angle of elipse axis with x-axis.  angle is given in degrees.
 0

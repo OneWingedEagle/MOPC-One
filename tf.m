@@ -276,7 +276,7 @@ nAg=sqrt(em);
 
  Ts=cos(2*pi*p/ndiv)^2;
  Rs=0;
-  Fr=90*sin(2*pi*p/ndiv);
+ Fr=0;%%90*sin(2*pi*p/ndiv);
  
  e1=epsa(1,1);
  e2=epsb(1,1);

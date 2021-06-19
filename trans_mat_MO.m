@@ -1,4 +1,4 @@
-function tf
+function trans_mat_MO
 
 clear all
 
@@ -326,9 +326,9 @@ end
   
   TT=inv(D0)*T*D0;
  
-  angle=TT(3,3)/TT(1,1);
+  ang=TT(3,3)/TT(1,1);
   
-  Fr=arg(angle)*90./pi();
+  Fr=angle(ang)*90./pi();
   
   t2=1./(TT(1,1)*conj(TT(1,1)));
 

@@ -4,6 +4,7 @@ function charter
 [filename,filepath]=uigetfile('*.txt', 'Select results file')
 file=strcat(filepath,strcat('\',filename));
 data0=csvread(file,3,0);
+data0
 
 [filename1,filepath1]=uigetfile('*.txt', 'Select results file')
 file1=strcat(filepath1,strcat('\',filename1));

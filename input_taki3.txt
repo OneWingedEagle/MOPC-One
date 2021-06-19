@@ -5,9 +5,8 @@
 //The first input parametrer is GEOMETRY which describes the bar cross-section being elliptical or rectangular
 //GEOMETRY =0 indicates eliptical, GEOMETRY =1 is for rectangular
 //GEOMETRY 
-0     
-//0.082  0.082 .0
-.5	0.5
+0   
+.2  .20
 //Rx Ry
 //fi  anticlockiwise angle of elipse axis with x-axis.  angle is given in degrees.
 0
@@ -15,28 +14,24 @@
 // theta =0 means the light direction is perpendicular to the slab
 // second value is for the mode of incidence. 0: E-polarization, 1: H-polarization
 0
-//CRYSTAL CONSTANT
-// ax        ay
-1   1
+//CRYSTAL CONSTANT * MARGIN
+// ax    ay   d
+1.0	1.0	0.5
 //EPS1 EPS3
 1.0	1.0
 //epsilon of the back ground. The first 3 are the elpsion sin the x , y and z direction and the forth one is the //complex part.
-//EPS_BACKGROUND
-5.5 5.5 5.5	0.0
-//4.92  4.92  4.92  0.0
-//2.75 	2.75	2.75 	0.05
+//EPS_BACKGROUND1. 	
+5.6	
 //epsilon of the bars. The first 3 are the elpsion sin the x , y and z direction and the forth one is the complex //part.
 //EPS_BAR
-//5.6 5.6	5.6 0.1
-1 	1.	1. 	0.0
-//2.2201  2.2201 2.2201 0.0
+1.0 
 //N bars *  num defects * start def
-10
+16         0     0    
 //Transmittivity  FaradayRotation
-1 0
+4 0
 // WN1	WN2 DIVISION
-0.3 .7 60
-0 1
+.2 0.5  108
+2 50
 //PlotFouriesSeries   Plot3DVectors
 0 0
 
