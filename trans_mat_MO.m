@@ -286,15 +286,31 @@ if(rotation &&length(Tr)>1)
              
              hmax=50;
              
-             ttmax=max(Tr);    
+             ttmax=max(Tr);   
+
+            if(ttmax<=0)
+             hmax=0; 
+            end
             if(ttmax>45) 
              div= round(ttmax/5);
             
              hmax=(div+1)*5;
              
+           end
+           
+              ttmin=min(Tr);
+           if(ttmin>=0) hmin=0;
+          else 
+           hmin=ttmin*1.1;
+           end
+           if(ttmin<-45) 
+             div= round(ttmin/5);
+            
+             hmin=-(div+1)*5;
+             
              end
            
-             axis([wn1,wn2,0,hmax]);
+             axis([wn1,wn2,hmin,hmax]);
              hold on
              
         %   plot(Fn,Fr_hom,'+k');
