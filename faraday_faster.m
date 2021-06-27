@@ -277,7 +277,7 @@ if(dmm>1)
 nk=2;
 end
 
-single_percision=1; % using single or double percison numbers
+single_percision=0; % using single or double percison numbers
 
 d=d1+d2;
 
@@ -1483,11 +1483,11 @@ global Kapa;
  Kapa=zeros(4*nGx+1,4*nGy+1,4)+1i*zeros(4*nGx+1,4*nGy+1,4);
 
 
-ngridx=40;
+ngridx=80;
 if(nGx==0) 
 ngridx=2;
 end
-ngridy=40;
+ngridy=80;
 if(nGy<2) 
 ngridy=2;
 end

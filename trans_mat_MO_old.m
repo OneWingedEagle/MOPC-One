@@ -1,9 +1,8 @@
-function trans_mat_MO
+function trans_mat_MO_old
 
 clear all
 
-colors = {'-or', '-ob', '-oc', '-ok','-*r', '-*b', '-*c', '-*k','-xr', '-xb',... 
-'-r', '-b', '-c', '-k','-g'};
+colors = {'-or', '-ob', '-oc', '-ok','-*r', '-*b', '-*c', '-*k','-xr', '-xb', '-xc', '-xk'};
 
 [filename1,filepath1]=uigetfile('*.txt', 'Selectinput file')
  cd(filepath1)
@@ -14,18 +13,18 @@ numbs = str2num(line);
 theta= numbs(1);
 
 %%=========  stack befor defect
-dd10=[0 0 0];
+dd1=[0 0 0];
 eps1=[1 1 1];
 gama1=[0 0 0];
 line=getNewDataLine(fid);
 numbs = str2num(line);
-dd10(1)=numbs(1);
+dd1(1)=numbs(1);
 
 if(length(numbs)>1)
-dd10(2)=numbs(2);
+dd1(2)=numbs(2);
 end
 if(length(numbs)>2)
-dd10(3)=numbs(3);
+dd1(3)=numbs(3);
 end
 
 line=getNewDataLine(fid);
@@ -90,18 +89,18 @@ end
 %%=============
 
 %%=========  stack befor defect
-dd20=[0 0 0];
+dd2=[0 0 0];
 eps2=[1 1 1];
 gama2=[0 0 0];
 line=getNewDataLine(fid);
 numbs = str2num(line);
-dd20(1)=numbs(1);
+dd2(1)=numbs(1);
 
 if(length(numbs)>1)
-dd20(2)=numbs(2);
+dd2(2)=numbs(2);
 end
 if(length(numbs)>2)
-dd20(3)=numbs(3);
+dd2(3)=numbs(3);
 end
 
 line=getNewDataLine(fid);
@@ -143,10 +142,6 @@ line=getNewDataLine(fid);
 numbs = str2num(line);
 transmit=numbs(1);
 rotation=numbs(2);
-show_crystal=0;
-if(length(numbs)>2)
-show_crystal=numbs(3);
-end
 
 if(transmit>0)
 colT=colors{transmit};
@@ -160,6 +155,8 @@ else
 colR=colors{2};
 end
 
+
+
 line=getNewDataLine(fid);
 numbs = str2num(line);
 
@@ -169,48 +166,7 @@ wn2=numbs(2);
 global ndiv;
 ndiv=numbs(3);
 
-%====================================================
-%== Variable thinkness begins
-% the following lines till [Variable thinkness ends]..
-%define variable thinkness. 
-%If amp1=amp2=0. thinkness dont vary from layer to layer
-amp1=.0; % bteween 0 and 1.0. 
-amp2=.0; % bteween 0 and 1.0.
-omg1=0;
-omg2=0;
-if(N1>0)
-omg1=1.0*pi/N1;% you can try another number instead of 2.0
-end
-if(N2>0)
-omg2=1.0*pi/N2;% you can try another number instead of 2.0
-end
-dd1=zeros(N1,3);
-dd2=zeros(N2,3);
-for i=1:N1
-for j=1:3
-if(j==1)
-dd1(i,j)=dd10(j)*(1+amp1*sin(i*omg1));
-elseif(j==2)
-dd1(i,j)=dd10(j)*(1-amp1*sin(i*omg1));
-else
-dd1(i,j)=dd10(j);
-end
-end
-end
-
-for i=1:N2
-for j=1:3
-if(j==3)
-dd2(i,j)=dd20(j)*(1+amp2*sin((N2-i+1)*omg2));
-elseif(j==2)
-dd2(i,j)=dd20(j)*(1-amp2*sin((N2-i+1)*omg2));
-else 
-dd2(i,j)=dd20(j);
-end
-end
-end
-%== Variable thinkness ends
-%====================================================
+%=================
 
 t1=cputime;
 
@@ -228,7 +184,7 @@ for p=1:ndiv+1
 
 
    [Ts Rs,Fr]=TransferMatrixMultiLayer(eps1,epsdef,eps2,gama1,gamadef,...
-   gama1,dd1,ddef,dd2,N1,Ndef,N2,wvlen,p,theta,show_crystal);
+   gama1,dd1,ddef,dd2,N1,Ndef,N2,wvlen,p,theta);
            
       if(real(Ts)>1) 
       %  Ts=1;
@@ -284,17 +240,8 @@ if(rotation &&length(Tr)>1)
                 figure(1)
              plot(Fn,Tr,colR);
              
-             hmax=50;
-             
-             ttmax=max(Tr);    
-            if(ttmax>45) 
-             div= round(ttmax/5);
-            
-             hmax=(div+1)*5;
-             
-             end
-           
-             axis([wn1,wn2,0,hmax]);
+ 
+             axis([wn1,wn2,0,40]);
              hold on
              
         %   plot(Fn,Fr_hom,'+k');
@@ -311,99 +258,15 @@ if(transmit &&length(Tt)>1)
             
 end
 
-
-
-
-if(show_crystal==1)
-figure(10)
-x0=0;
-y0=0;
-w0=1
-h=1;
-c1=['r','y','c'];
-
-ww=0;
-for i=1:N1
-for j=1:3
-w=dd1(i,j);
-if(w>0)
-rectangle('Position',[x0+ww y0 w h],'FaceColor',c1(j),'EdgeColor','None');
-ww=ww+w;
-end
-end
-end
-
-c2=['g','g','g'];
-for i=1:Ndef
-for j=1:3
-w=ddef(j);
-if(w>0)
-rectangle('Position',[x0+ww y0 w h],'FaceColor',c2(j),'EdgeColor','None');
-ww=ww+w;
-end
-end
-end
-
-c3=['c','y','r'];
-
-for i=1:N2
-for j=1:3
-w=dd2(i,j);
-if(w>0)
-rectangle('Position',[x0+ww y0 w h],'FaceColor',c3(j),'EdgeColor','None');
-ww=ww+w;
-end
-end
-end
-
-rectangle('Position',[x0 y0 ww h]);
-
-axis([0 ww 0 2]);
-end
-
 end
 
 
 
 function [Ts Rs Fr]=TransferMatrixMultiLayer(eps1,epsdef,eps2,...,
-  gama1,gamadef,gama2,dd1,ddef,dd2,N1,Ndef,N2,wvlen,p,theta,show_crystal)
+  gama1,gamadef,gama2,dd1,ddef,dd2,N1,Ndef,N2,wvlen,p,theta)
 
-variable_d1=[0 0 0];
-variable_d2=[0 0 0];
-maxd=[0 0 0];
-mind=[1.0e10 1.0e10 1.0e10];
-for i=1:N1
-for j=1:3
-w=dd1(j);
-if(w>maxd(j)) maxd(j)=w; end
-if(w<mind(j)) mind(j)=w; end
-end
-end
 
-for j=1:3
-  if(maxd(j)~=mind(j))
-  variable_d1(j)=1;
- end
-end
-
-maxd=[0 0 0];
-mind=[1.0e10 1.0e10 1.0e10];
-for i=1:N2
-for j=1:3
-w=dd2(j);
-if(w>maxd(j)) maxd(j)=w; end
-if(w<mind(j)) mind(j)=w; end
-end
-end
-
-for j=1:3
-  if(maxd(j)~=mind(j))
-  variable_d2(j)=1;
- end
-end
-%%%%%%%%%%%%%%%%%%%%
- 
-lam=wvlen;
+ lam=wvlen;
 
 omega=2*pi/lam;
 
@@ -412,26 +275,14 @@ Ts=1;
   Fr=0;
  
   %$$$$============= stacks before defect
-  T1=TransferMatrix(eps1(1),gama1(1),omega,dd1(1,1));
-  T2=TransferMatrix(eps1(2),gama1(2),omega,dd1(1,2));
-  T3=TransferMatrix(eps1(3),gama1(3),omega,dd1(1,3));
+  T1=TransferMatrix(eps1(1),gama1(1),omega,dd1(1));
+  T2=TransferMatrix(eps1(2),gama1(2),omega,dd1(2));
+  T3=TransferMatrix(eps1(3),gama1(3),omega,dd1(3));
   %%%%%%%%%%%%%%%
    T123=T1*T2*T3;
    TT1=T123;
      
   for n=2:N1
-   if(variable_d1(1)==1)
-    T1=TransferMatrix(eps1(1),gama1(1),omega,dd1(n,1));
-   end
-   if(variable_d1(2)==1)
-    T2=TransferMatrix(eps1(2),gama1(2),omega,dd1(n,2));
-   end
-   if(variable_d1(3)==1)
-    T3=TransferMatrix(eps1(3),gama1(3),omega,dd1(n,3));
-   end
-   if(variable_d1(1)+variable_d1(2)+variable_d1(3)>0)
-    T123=T1*T2*T3;
-   end
     TT1=T123*TT1;
   end
   
@@ -451,26 +302,13 @@ end
 
   %$$$$============= stacks after defect
   if(N2>0)
-
-  T1=TransferMatrix(eps2(1),gama2(1),omega,dd2(1,1));
-  T2=TransferMatrix(eps2(2),gama2(2),omega,dd2(1,2));
-  T3=TransferMatrix(eps2(3),gama2(3),omega,dd2(1,3));
+  T1=TransferMatrix(eps2(1),gama2(1),omega,dd2(1));
+  T2=TransferMatrix(eps2(2),gama2(2),omega,dd2(2));
+  T3=TransferMatrix(eps2(3),gama2(3),omega,dd2(3));
   %%%%%%%%%%%%%%%
    T123=T1*T2*T3;
    TT2=T123;
   for n=2:N2
-   if(variable_d2(1)==1)
-      T1=TransferMatrix(eps2(1),gama2(1),omega,dd2(n,1));
-   end   
-   if(variable_d2(2)==1)   
-      T2=TransferMatrix(eps2(2),gama2(2),omega,dd2(n,2));
-   end   
-   if(variable_d2(3)==1)   
-      T3=TransferMatrix(eps2(3),gama2(3),omega,dd2(n,3));
-   end
-     if(variable_d2(1)+variable_d2(2)+variable_d2(3)>0)
-      T123=T1*T2*T3;
-   end
     TT2=T123*TT2;
   end
 end

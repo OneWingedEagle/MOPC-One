@@ -25,9 +25,9 @@
 0   0.009 0.0
 ///=============================
 //Num_STACKS_before_def *  num defects * Num_STACKS_before_def
-9 2 9
+10 0 10
 //Transmittivity  FaradayRotation
-1 1
+3 3
 //========  wavelength (micron)
 // start	end DIVISION
 .8 2.2 360

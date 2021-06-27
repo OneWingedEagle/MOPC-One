@@ -1,14 +1,35 @@
 function charter
-  
+
+figure(5)
+
+N=10
+x0=0;
+y0=0;
+w0=1
+h=1;
+c=['r','c','g'];
+
+ww=0;
+for i=1:N
+w=(1+.1*i)*w0
+j=mod(i,3)+1;
+%patch([x0+i-1 x0+i x0+i x0+i-1],[0 0 1 1],c(i),'EdgeColor','k');
+rectangle('Position',[x0+ww y0 w h],'FaceColor',c(j))
+ww=ww+w;
+end
+axis([0 ww 0 1]);
+
+hold on
+
 %filename= 'D:\Works and Studies\Photonic\Lumerical\models\faradary_isolator\results-7-180s-108.txt';
 [filename,filepath]=uigetfile('*.txt', 'Select results file')
 file=strcat(filepath,strcat('\',filename));
 data0=csvread(file,3,0);
 data0;
 
-%[filename1,filepath1]=uigetfile('*.txt', 'Select results file')
-%file1=strcat(filepath1,strcat('\',filename1));
-%data1=csvread(file1,3,0);
+[filename1,filepath1]=uigetfile('*.txt', 'Select results file')
+file1=strcat(filepath1,strcat('\',filename1));
+data1=csvread(file1,3,0);
      
 
 data=data0;
@@ -47,7 +68,7 @@ Fn=data(:,1);
 wn1=Fn(1);
 wn2=Fn(ndata);
 
-colT='-r';
+colT='-k';
 colR='-r';
 
 

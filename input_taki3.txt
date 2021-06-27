@@ -30,8 +30,8 @@
 //Transmittivity  FaradayRotation
 1 0
 // WN1	WN2 DIVISION
-.6 0.7 30
-0 400
+.4545 1.25 300
+0 300
 //PlotFouriesSeries   Plot3DVectors
 0 0
 
