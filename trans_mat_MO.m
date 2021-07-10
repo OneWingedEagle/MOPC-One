@@ -14,6 +14,8 @@ numbs = str2num(line);
 theta= numbs(1);
 
 %%=========  stack befor defect
+amp1=0;
+omgfact1=0;
 dd10=[0 0 0];
 eps1=[1 1 1];
 gama1=[0 0 0];
@@ -26,6 +28,14 @@ dd10(2)=numbs(2);
 end
 if(length(numbs)>2)
 dd10(3)=numbs(3);
+end
+
+if(length(numbs)>3)
+amp1=numbs(4);
+end
+
+if(length(numbs)>4)
+omgfact1=numbs(5);
 end
 
 line=getNewDataLine(fid);
@@ -93,6 +103,8 @@ end
 dd20=[0 0 0];
 eps2=[1 1 1];
 gama2=[0 0 0];
+amp2=0;
+omgfact2=0;
 line=getNewDataLine(fid);
 numbs = str2num(line);
 dd20(1)=numbs(1);
@@ -102,6 +114,14 @@ dd20(2)=numbs(2);
 end
 if(length(numbs)>2)
 dd20(3)=numbs(3);
+end
+
+if(length(numbs)>3)
+amp2=numbs(4);
+end
+
+if(length(numbs)>4)
+omgfact2=numbs(5);
 end
 
 line=getNewDataLine(fid);
@@ -174,36 +194,41 @@ ndiv=numbs(3);
 % the following lines till [Variable thinkness ends]..
 %define variable thinkness. 
 %If amp1=amp2=0. thinkness dont vary from layer to layer
-amp1=.0; % bteween 0 and 1.0. 
-amp2=.0; % bteween 0 and 1.0.
+%amp1=.25; % bteween 0 and 1.0. 
+%amp2=.25; % bteween 0 and 1.0.
 omg1=0;
 omg2=0;
-if(N1>0)
-omg1=1.0*pi/N1;% you can try another number instead of 2.0
+if(N1>1)
+omg1=omgfact1*pi/(N1-1);% you can try another number instead of 1.0
 end
-if(N2>0)
-omg2=1.0*pi/N2;% you can try another number instead of 2.0
+if(N2>1)
+omg2=omgfact2*pi/(N2-1);% you can try another number instead of 1.0
 end
 dd1=zeros(N1,3);
 dd2=zeros(N2,3);
 for i=1:N1
+tk1=dd10(1)+dd10(2)+dd10(3);
 for j=1:3
 if(j==1)
-dd1(i,j)=dd10(j)*(1+amp1*sin(i*omg1));
+dd1(i,j)=dd10(j)+tk1*amp1*sin((i-1)*omg1);
 elseif(j==2)
-dd1(i,j)=dd10(j)*(1-amp1*sin(i*omg1));
+dd1(i,j)=dd10(j)-tk1*amp1*sin((i-1)*omg1);
 else
 dd1(i,j)=dd10(j);
 end
 end
 end
 
+%figure(11)
+% plot(dd1(:,1),colR);
+
 for i=1:N2
+tk2=dd20(1)+dd20(2)+dd20(3);
 for j=1:3
 if(j==3)
-dd2(i,j)=dd20(j)*(1+amp2*sin((N2-i+1)*omg2));
+dd2(i,j)=dd20(j)+tk2*amp2*sin((N2-i)*omg2);
 elseif(j==2)
-dd2(i,j)=dd20(j)*(1-amp2*sin((N2-i+1)*omg2));
+dd2(i,j)=dd20(j)-tk2*amp2*sin((N2-i)*omg2);
 else 
 dd2(i,j)=dd20(j);
 end
@@ -303,13 +328,13 @@ if(rotation &&length(Tr)>1)
           else 
            hmin=ttmin*1.1;
            end
-           if(ttmin<-45) 
-             div= round(ttmin/5);
+           if(hmin<-45) 
+             div= round(hmin/5);
             
              hmin=-(div+1)*5;
              
              end
-           
+
              axis([wn1,wn2,hmin,hmax]);
              hold on
              
@@ -334,7 +359,7 @@ if(show_crystal==1)
 figure(10)
 x0=0;
 y0=0;
-w0=1
+w0=1;
 h=1;
 c1=['r','y','c'];
 
@@ -390,12 +415,11 @@ maxd=[0 0 0];
 mind=[1.0e10 1.0e10 1.0e10];
 for i=1:N1
 for j=1:3
-w=dd1(j);
+w=dd1(i,j);
 if(w>maxd(j)) maxd(j)=w; end
 if(w<mind(j)) mind(j)=w; end
 end
 end
-
 for j=1:3
   if(maxd(j)~=mind(j))
   variable_d1(j)=1;
@@ -406,7 +430,7 @@ maxd=[0 0 0];
 mind=[1.0e10 1.0e10 1.0e10];
 for i=1:N2
 for j=1:3
-w=dd2(j);
+w=dd2(i,j);
 if(w>maxd(j)) maxd(j)=w; end
 if(w<mind(j)) mind(j)=w; end
 end
