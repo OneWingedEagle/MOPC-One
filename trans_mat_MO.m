@@ -199,20 +199,25 @@ ndiv=numbs(3);
 omg1=0;
 omg2=0;
 if(N1>1)
-omg1=omgfact1*pi/(N1-1);% you can try another number instead of 1.0
+omg1=omgfact1*pi;%%(N1-1);% you can try another number instead of 1.0
 end
 if(N2>1)
-omg2=omgfact2*pi/(N2-1);% you can try another number instead of 1.0
+omg2=omgfact2*pi;%%/(N2-1);% you can try another number instead of 1.0
 end
 dd1=zeros(N1,3);
 dd2=zeros(N2,3);
-for i=1:N1
+
 tk1=dd10(1)+dd10(2)+dd10(3);
+
+L1=N1*tk1;
+for i=1:N1
+dist=tk1*(i-.5);
+sinfact=sin(dist/L1*omg1);
 for j=1:3
 if(j==1)
-dd1(i,j)=dd10(j)+tk1*amp1*sin((i-1)*omg1);
+dd1(i,j)=dd10(j)+tk1*amp1*sinfact;
 elseif(j==2)
-dd1(i,j)=dd10(j)-tk1*amp1*sin((i-1)*omg1);
+dd1(i,j)=dd10(j)-tk1*amp1*sinfact;
 else
 dd1(i,j)=dd10(j);
 end
@@ -222,13 +227,17 @@ end
 %figure(11)
 % plot(dd1(:,1),colR);
 
-for i=1:N2
 tk2=dd20(1)+dd20(2)+dd20(3);
+L2=N2*tk2;
+
+for i=1:N2
+dist=L2-(i-0.5)*tk2;
+sinfact=sin(dist/L2*omg2);
 for j=1:3
 if(j==3)
-dd2(i,j)=dd20(j)+tk2*amp2*sin((N2-i)*omg2);
+dd2(i,j)=dd20(j)+tk2*amp2*sinfact;
 elseif(j==2)
-dd2(i,j)=dd20(j)-tk2*amp2*sin((N2-i)*omg2);
+dd2(i,j)=dd20(j)-tk2*amp2*sinfact;
 else 
 dd2(i,j)=dd20(j);
 end
