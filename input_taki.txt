@@ -7,32 +7,32 @@
 //GEOMETRY 
 0   
 // Rx  Ry  a
-.504 .504  
+.504 .504  1.17
 //Rx Ry
 //fi  anticlockiwise angle of elipse axis with x-axis.  angle is given in degrees.
 0
 //theta  angle of incident light in degrees.
-// theta =0 means the light direction is perpendicular to the slab
+ theta =68 means the light direction is perpendicular to the slab
 // second value is for the mode of incidence. 0: E-polarization, 1: H-polarization
-0
-//LATTICE_CONST1 * LATTICE_CONST2 * MARGIN
-// a1    a2   d 
-1.17   1.17	0.0
+45
+//FACTOR1 * FACTOR2 * MARGIN
+// px    py   d 
+1.4142	1.4142	0.0
 //EPS1 EPS3
 1.0	1.0
 //epsilon of the back ground. The first 3 are the elpsion sin the x , y and z direction and the forth one is the //complex part.
 //EPS_BACKGROUND1. 	
-2.72	
+6.25	
 //epsilon of the bars. The first 3 are the elpsion sin the x , y and z direction and the forth one is the complex //part.
 //EPS_BAR
 1.0 
 //N bars *  num defects * start def
-16        
+16         0     0     
 //Transmittivity  FaradayRotation
-1 0
+2 0
 // WN1	WN2 DIVISION
-.3 0.5  36
-0 50
+.4 0.7  108
+4 100
 //PlotFouriesSeries   Plot3DVectors
 0 0
 

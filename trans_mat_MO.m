@@ -550,29 +550,39 @@ end
 
 function [Dn]=DynamicMatrix(e1, Q,omega)
 
-  pv1=(1./sqrt(2))*transpose([1 1i 0]);
-  pv2=(1./sqrt(2))*transpose([-1 -1i 0]);
-  pv3=(1./sqrt(2))*transpose([1 -1i 0]);  
-  pv4=(1./sqrt(2))*transpose([-1 1i 0]);
+%% pv1=(1./sqrt(2))*transpose([1 1i 0]);
+%% pv2=(1./sqrt(2))*transpose([-1 -1i 0]);
+%% pv3=(1./sqrt(2))*transpose([1 -1i 0]);  
+%% pv4=(1./sqrt(2))*transpose([-1 1i 0]);
+%% 
+##
+%% kz=[0 0 1]';
+%% 
+%% kv1=sqrt(e1*(1+Q))*kz;
+%% kv2=-sqrt(e1*(1+Q))*kz;
+%% kv3=sqrt(e1*(1-Q))*kz; 
+%% kv4=-sqrt(e1*(1-Q))*kz; 
+##
+%% 
+%% qv1=cross(kv1,pv1);
+%% qv2=cross(kv2,pv2);    
+%% qv3=cross(kv3,pv3);
+%% qv4=cross(kv4,pv4);
+%% 
+%% Dn=[pv1(1) pv2(1) pv3(1) pv4(1);...
+%%    qv1(2) qv2(2) qv3(2) qv4(2);...
+%%   pv1(2) pv2(2) pv3(2) pv4(2);...
+%%   qv1(1) qv2(1) qv3(1) qv4(1)];
   
-
-  kz=omega*[0 0 1]';
+ c1=sqrt(e1*(1+Q));
+  c2=-sqrt(e1*(1+Q));
+  c3=sqrt(e1*(1-Q)); 
+  c4=-sqrt(e1*(1-Q)); 
   
-  kv1=sqrt(e1*(1+Q))*kz;
-  kv2=-sqrt(e1*(1+Q))*kz;
-  kv3=sqrt(e1*(1-Q))*kz; 
-  kv4=-sqrt(e1*(1-Q))*kz; 
-
-  
-  qv1=1/omega*cross(kv1,pv1);
-  qv2=1/omega*cross(kv2,pv2);    
-  qv3=1/omega*cross(kv3,pv3);
-  qv4=1/omega*cross(kv4,pv4);
-  
-  Dn=[pv1(1) pv2(1) pv3(1) pv4(1);...
-     qv1(2) qv2(2) qv3(2) qv4(2);...
-    pv1(2) pv2(2) pv3(2) pv4(2);...
-    qv1(1) qv2(1) qv3(1) qv4(1)];
+      Dn=1./sqrt(2)*[1 -1 1 -1;...
+     c1 -c2 c3 -c4;...
+    1i -1i -1i 1i;...
+    -c1*1i c2*1i c3*1i -c4*1i];
 end
 
 

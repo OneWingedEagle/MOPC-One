@@ -22,7 +22,7 @@
 //epsilon of the back ground. The first 3 are the elpsion sin the x , y and z direction and the forth one is the //complex part.
 //EPS_BACKGROUND1. 	
 //1. 	1.	1. 	0.0
-5.5 5.5	5.5 	0.01
+1.5 1.5	1.5 	0.0
 //epsilon of the bars. The first 3 are the elpsion sin the x , y and z direction and the forth one is the complex //part.
 //EPS_BAR
 1. 	1.	1. 	0.0
@@ -32,9 +32,9 @@
 1	1
 // WN1	WN2 DIVISION
 //.3  .6  10
-1.801801  1.834800   60
+1.801801e-1  1.834800e-1   30
 //1.8181818 1.8181818  0
-0 30
+0 400
 //PlotFouriesSeries   Plot3DVectors
 0 0
 

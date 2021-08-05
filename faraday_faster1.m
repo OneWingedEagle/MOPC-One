@@ -32,6 +32,13 @@ numbs = str2num(line);
 Rx=numbs(1);
 Ry=numbs(2);
 
+
+%cryst_const=1;
+%if(length(numbs)>2)
+%cryst_const=numbs(3);
+%end
+
+
 line=getNewDataLine(fid);
 numbs = str2num(line);
 fi=numbs(1);
@@ -47,21 +54,16 @@ end
 
 line=getNewDataLine(fid);
 numbs = str2num(line);
-factor1=numbs(1);
-factor2=numbs(2);
+a1=numbs(1);
+a2=numbs(2);
 
 d1=0;
 if(length(numbs)>2)
 d1=numbs(3);
 end
 
-cryst_const=1;
-if(length(numbs)>3)
-cryst_const=numbs(4);
-end
-
-a1=cryst_const*factor1;
-a2=cryst_const*factor2;
+%a1=cryst_const*factor1;
+%a2=cryst_const*factor2;
 
 d2=d1;
 
@@ -165,6 +167,8 @@ cf=(plotWave==0);
 
 Fr_hom=zeros(1*cf*ndiv+1,1);
 
+a1
+a2
 
 for p=1:1*cf*ndiv+1
       
@@ -174,7 +178,11 @@ for p=1:1*cf*ndiv+1
    % theta=p;
 
     wn=Fn(p);
-    k1=sqrt(eps1)*2*pi*wn/cryst_const;
+   % if(cryst_const==1)
+     k1=sqrt(eps1)*2*pi*wn/a2;
+  %  else
+  %      k1=sqrt(eps1)*2*pi*wn/cryst_const;
+ %   end
      Fr_hom(p)=-180*gamab/sqrt(epsbx)*Na*wn;
 
      Fn(p)=Fn1+dFn*(p-1);
@@ -269,7 +277,7 @@ if(dmm>1)
 nk=2;
 end
 
-single_percision=1; % using single or double percison numbers
+single_percision=0; % using single or double percison numbers
 
 d=d1+d2;
 
@@ -1475,11 +1483,11 @@ global Kapa;
  Kapa=zeros(4*nGx+1,4*nGy+1,4)+1i*zeros(4*nGx+1,4*nGy+1,4);
 
 
-ngridx=40;
+ngridx=80;
 if(nGx==0) 
 ngridx=2;
 end
-ngridy=40;
+ngridy=80;
 if(nGy<2) 
 ngridy=2;
 end

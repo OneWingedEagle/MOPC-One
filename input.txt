@@ -7,15 +7,13 @@
 //GEOMETRY 
 0   
 .504  .504
-//.50  .50
-//.3 .5
 //Rx Ry
 //fi  anticlockiwise angle of elipse axis with x-axis.  angle is given in degrees.
 0
 //theta  angle of incident light in degrees.
 // theta =0 means the light direction is perpendicular to the slab
 // second value is for the mode of incidence. 0: E-polarization, 1: H-polarization
-0
+45
 //CRYSTAL CONSTANT
 // ax        ay
 1.17	1.17
@@ -34,13 +32,13 @@
 //5.5 	5.5	5.5 	0.01
 //N bars *  num defects * start def
 //8         2     4    
-8    
+16   
 //Transmittivity  FaradayRotation
-0 5
+2 2
 // WN1	WN2 DIVISION
 .3 .6  60
 //1.3  1.4   10
-0 150
+0 50
 //PlotFouriesSeries   Plot3DVectors
 0 0
 
