@@ -1,0 +1,4 @@
+[nGx *  nGy]
+0	3000
+[Fn *  Rotation * Transmitance ]
+1.818182, -0.240869, 0.058406, 0.000001
