@@ -271,9 +271,9 @@ if(rotation &&length(FR)>1)
                 figure(1)
              plot(Fn,FR,colR);
              
-              axis([Fn1,Fn2,-90,0]);
+            %  axis([Fn1,Fn2,-90,0]);
 
-            % axis([Fn1,Fn2,-90,90]);
+             axis([Fn1,Fn2,-90,90]);
              hold on
              
          %  plot(Fn,Fr_hom,'+k');
@@ -693,7 +693,7 @@ disp('solving matrix...');
 
   NN=NN+MM;   
 
-gpu=0;
+gpu=1;
 
 if(gpu>0)
  gpux=gpuArray(NN)\gpuArray(bN);
@@ -822,23 +822,24 @@ Ez=zeros(nL);
     end
     
 
-%  figure(12)
- % plot(yy,Ez,colorAng);
- %hold on;
 Fr=0;
 
 if(nk>1)
 
    
- TM_fract=abs(Tsx0/Ts0);
-ct=sqrt(TM_fract);
+% TM_fract=abs(Tsx0/Ts0);
+%ct=sqrt(TM_fract);
 
-angle=asin(ct);
+%angle=asin(ct);
 
-Fr=-(angle)*180/pi;
+angle=atand(abs(Tn(nGx+1,1))/abs(Tn(nGx+1,nk)));
 
+if(real(Tn(nGx+1,1))/real(Tn(nGx+1,nk))<0) 
+angle=-angle;
+end;
 
-%%%%Fr=(Fr-Fr0);
+Fr=angle;
+
 
 if(plotWave)
     
