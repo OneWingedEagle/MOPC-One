@@ -239,6 +239,7 @@ fprintf(fid,'%d\t%d\n',nGx,nGy);
 fprintf(fid,'[Fn *  Rotation * Transmitance ]\n');  
 
 
+
   for p=1:1*cf*ndiv+1
   
   result(p,1)= Fn(p);
@@ -685,7 +686,7 @@ disp('solving matrix...');
 
   NN=NN+MM;   
 
-gpu=0;
+gpu=1;
 
 if(gpu>0)
  gpux=gpuArray(NN)\gpuArray(bN);
