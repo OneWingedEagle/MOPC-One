@@ -16,7 +16,7 @@ line=getNewDataLine(fid);
 numbs = str2num(line);
 geometry=numbs(1);
 global fext;
-rec=0;
+rec=1;
 fext=1;
 
 
@@ -25,7 +25,7 @@ if(numbs(2)>0);
 rec=1;
 end
 end
-rec=0;
+rec=1;
 line=getNewDataLine(fid);
 numbs = str2num(line);
 Rx=numbs(1);
@@ -359,7 +359,31 @@ if(p==1)
  
    if(plotFT)
         
+       if(nGx==0)
+       ndy=40*Na;
         
+        y=linspace(-L,L,ndy);
+        Kapar=zeros(ndy);       
+
+            for iy=1:ndy
+
+                y1=y(iy);
+                tt=0;
+                    for m=-nGy:nGy
+                        Gm=by*m;
+                        TT=Kapa(2*nGx+1,m+2*nGy+1,plotFT);
+                        
+                        tt=tt+TT*exp(1i*(Gm*y1));
+                    end
+
+                Kapar(iy)=real(tt);
+            end
+   
+
+        figure(4);
+
+        plot(y,Kapar);
+     else 
         ndx=30;
  	      ndy=40*Na;
         
@@ -403,6 +427,7 @@ if(p==1)
         axis equal;
         set(gca,'DataAspectRatio',[1 1 .05]);
 %        return;
+        end
     end
 
     disp('Computing matrix, step 1...');
