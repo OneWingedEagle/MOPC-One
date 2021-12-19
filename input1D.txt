@@ -10,18 +10,20 @@
 1.0	1.0
 //epsilon of the back ground. The first 3 are the elpsion sin the x , y and z direction and the forth one is the //complex part.
 //EPS_BACKGROUND
-2.72 0.0
+2.72 0.01
 //epsilon of the bars. The first 3 are the elpsion sin the x , y and z direction and the forth one is the complex //part.
 //EPS_BAR
-1. 	0.0
+1 0.0
 //N bars *  num defects * start def
-8
+20
 //Transmittivity  FaradayRotation
 1 1
 // WN1	WN2 DIVISION
 //1.5 2 40
-.3  .5 40
-100
+//1.801801  1.834800   60
+1  1.4  60
+//1.828200 1.828200 1
+400
 //PlotFouriesSeries   Plot3DVectors
 0 0
 

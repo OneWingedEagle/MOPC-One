@@ -23,13 +23,14 @@ if(size(data,2)==4)
 
 figure(1)
 
-Tz(:,1)=data(:,3)-data(:,4);
+Tz(:,1)=sqrt(abs(data(:,3)-data(:,4)));
+
  %%%  Tz Transmittance
  plot(Fn(:,1),Tz(:,1),'-ob','LineWidth',2);
  
  
 
-   axis([wn1,wn2,0,100]);
+   axis([wn1,wn2,0,1]);
    
   hold on
 

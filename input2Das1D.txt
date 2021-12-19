@@ -7,7 +7,7 @@
 //GEOMETRY 
  1   
 // Rx  Ry
-.5 .25
+.0 .25
 //fi  anticlockiwise angle of elipse axis with x-axis.  angle is given in degrees.
  0
 //theta  angle of incident light in degrees.
@@ -18,17 +18,17 @@
 1.0	1.0
 //epsilon of the back ground. The first 3 are the elpsion sin the x , y and z direction and the forth one is the //complex part.
 //EPS_BACKGROUND1. 	
-2.72	
+2.72	2.72 2.72 0.03
 //epsilon of the bars. The first 3 are the elpsion sin the x , y and z direction and the forth one is the complex //part.
 //EPS_BAR
-1.0 
+1.0  1.0  1.0  0.0
 //N bars *  num defects * start def
 8       
 //Transmittivity  FaradayRotation
-3 0
+2 2
 // WN1	WN2 DIVISION
-.3 0.9 118
-0 80
+.3 0.4 0
+0 2
 //PlotFouriesSeries   Plot3DVectors
-0 0
+4 0
  

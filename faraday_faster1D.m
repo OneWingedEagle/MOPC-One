@@ -351,7 +351,7 @@ if(p==1)
                     
                     Kapas(1:2)=Kapa(sGyp,1:2);                                       
                     Kapad(1:2)=Kapa(dGyp,1:2);
-                    
+
                     KapTenss=[Kapas(1) 1i*Kapas(2); 
                         -1i*Kapas(2)  Kapas(1)];
 
@@ -362,7 +362,7 @@ if(p==1)
                     
 
 
-                    CA=(KapTensd*-KapTenss)*(Gy1*by)^2;
+                    CA=(KapTensd-KapTenss)*(Gy1*by)^2;
                    
 
                     
@@ -377,25 +377,19 @@ if(p==1)
                     
                     
                 end
-                
-
-                    v=E0;
-                    for k=1:nk
-                        bE((countG-1)*nk+k)=v(k);
-                    end
-                                    
+                          
 
                     for k=1:nk                          
-                            MM((numG-1)*nk+k,(Gy-1)*nk+k)=pi*Gy;                         
+                            MM((numG)*nk+k,(Gy-1)*nk+k)=pi*Gy;                         
                     end
                     
                     if(mod(Gy,2)==0)
                         for k=1:nk
-                                MM((numG-1)*nk+k,(Gy-1)*nk+k)=pi*Gy;
+                                MM((1+numG)*nk+k,(Gy-1)*nk+k)=pi*Gy;
                         end
                     else
                         for k=1:nk
-                                MM((numG-1)*nk+k,(Gy-1)*nk+k)=-pi*Gy;
+                               MM((1+numG)*nk+k,(Gy-1)*nk+k)=-pi*Gy;
                         end
                     end
 
@@ -410,6 +404,7 @@ if(p==1)
     
 end
 
+MM;
 
 bN=zeros(nk*(numG+2),1);
 
@@ -455,13 +450,9 @@ countG=0;
         
         for k=1:nk
 
-                NN((countG-1)*nk+k,(numG)*nk+k)=pph/Gy*w2c2;
-      
-            if(Gx==0)
-                
+                NN((countG-1)*nk+k,(numG+1)*nk+k)=pph/Gy*w2c2;   
                 bN((countG-1)*nk+k)=-pph/Gy*w2c2*E0(k);
                 
-            end
         end
 
 end
@@ -479,31 +470,31 @@ end
                 NN((numG)*nk+k,(numG)*nk+k)=1;
                 
                 
-                NN((numG)*nk+k,(numG)*nk+k)=-(1i*L*krny+1);
+                NN((numG)*nk+k,(numG+1)*nk+k)=-(1i*L*krny+1);
                 
                 
-                NN((numG)*nk+k,(numG)*nk+k)=-(1i*L*ktny-1);
+                NN((numG+1)*nk+k,(numG)*nk+k)=-(1i*L*ktny-1);
                 
-                NN((numG)*nk+k,(numG)*nk+k)=-1;
+                NN((numG+1)*nk+k,(numG+1)*nk+k)=-1;
         
    
              bN((numG)*nk+k)= (1i*L*k1+1)*E0(k);
              if(k==1 && nk~=1)
-              bN((numG)*nk+k)=-E0(k);
+              bN((numG+1)*nk+k)=-E0(k);
               else
-              bN((numG)*nk+k)=E0(k);
+              bN((numG+1)*nk+k)=E0(k);
             end
 
     end
 
-
+NN;
 bN=bN+bE;
 
 disp('solving matrix...');
-
+bN;
 
   NN=NN+MM;   
-
+NN;
 gpu=0;
 
 if(gpu>0)
@@ -516,12 +507,12 @@ else
 
 
 Anm=zeros(nGy,nk);
-Tn=zeros(nk);
-Tn2=zeros(1);
-Tn2x=zeros(1);
+Tn=zeros(nk,1);
+Tn2=zeros(1,1);
+Tn2x=zeros(1,1);
 
-Rn=zeros(nk);
-Rn2=zeros(1);
+Rn=zeros(nk,1);
+Rn2=zeros(1,1);
 
 ix=0;
 
@@ -590,11 +581,11 @@ if(nk>1)
 %ct=sqrt(TM_fract);
 
 %angle=asin(ct);
-
+Tn;
 angle=atand(abs(Tn(1))/abs(Tn(nk)));
 
 if(real(Tn(1))/real(Tn(nk))<0) 
-angle=-angle;
+%angle=-angle;
 end;
 
 Fr=angle;
@@ -617,122 +608,6 @@ end
 end
 
 
-##function KapaRectangle(nGy,epsa,epsb,L,ddy1,Na,a2,d1)
-##global Kapa;
-##a2
-##ddy1
-##L
-##Na
-##disp('rectangular holes');
-##nk=4;
-##if(length(epsa)==1)
-##nk=1;
-##end
-##
-##invepsa1=inv(epsa);
-##invepsb1=inv(epsb);
-##
-##if(nk==1)
-##
-##invepsa=[invepsa1(1,1)];
-##invepsb=[invepsb1(1,1)];
-##
-##else
-##invepsa=[invepsa1(1,1)  invepsa1(2,2) 1 imag(invepsa1(1,2))];
-##invepsb=[invepsb1(1,1) invepsb1(2,2) 1  imag(invepsb1(1,2))];
-##
-##end
-##
-##cell_size=a2*Na*2;
-##rect_size=ddy1;
-##
-##fillx=1;
-##filly=ddy1/a2;
-##
-##by=pi/L;
-##
-##
-##KapaUnit=zeros(4*nGy+1,4)+1i*zeros(4*nGy+1,4);
-##
-##nGx=0;
-##
-##for dGx=-2*nGx:2*nGx
-##      dGxp=dGx+1+2*nGx;
-##
-##   for dGy=-2*nGy:2*nGy
-##        
-##        tty=dGy*by*ddy1/2;
-##     
-##        dGyp=dGy+1+2*nGy;
-##        
-##  for k=1:nk
-##       four_coefx= (invepsb(k)+fillx*(invepsa(k)-invepsb(k)));
-##        
-##         if(dGy==0)
-##       four_coefy= (invepsb(k)+filly*(invepsa(k)-invepsb(k)))/(2*Na);
-##        else
-##          four_coefy=(invepsa(k)-invepsb(k))*ddy1/(a2)*sin(tty)/(tty)/(2*Na);
-##       end
-##      
-##       
-##        KapaUnit(dGyp,k)=four_coefx*four_coefy;
-##
-##
-##  end
-##
-##end
-##
-##end
-##
-##
-##global ndef;
-##global defstart;
-##
-##by=pi/L;
-##
-##
-##Kapa=zeros(4*nGy+1,4)+1i*zeros(4*nGy+1,4);
-##
-##ndef
-##defstart
-##
-##defcount=0;
-##isDef=zeros(2*Na,1);
-##for n=0:Na-1 
-##  np=n+Na+1;
-## if(n+1>=defstart && defcount<ndef)
-## defcount=defcount+1;
-## isDef(np,1)=1;
-## isDef(Na-n,1)=1;
-## end
-##end
-##
-## dGxp=1+2*nGx;
-##
-##
-##by=pi/L;
-##
-##for n=-Na:Na-1 
-## np=n+Na+1;
-##
-## for dGy=-2*nGy:2*nGy
-##       
-##      dGyp=dGy+1+2*nGy;
-##      
-##      twindle=exp(-1i*(n+.5)*by*dGy*a2);
-##
-##     for k=1:nk
-##         Kapa(dGyp,k)=Kapa(dGyp,k)+KapaUnit(dGyp,k)*twindle;
-##     end
-##   
-##
-##        
-##    end
-##  end
-##  
-##end
-
-
 function KapaRectangle(nGy,epsa,epsb,L,ddy1,Na,a2,d1)
 global Kapa;
 
@@ -751,14 +626,13 @@ invepsa=[invepsa1(1,1)];
 invepsb=[invepsb1(1,1)];
 
 else
-invepsa=[invepsa1(1,1)  invepsa1(1,2)];
-invepsb=[invepsb1(1,1)  invepsb1(1,2)];
+invepsa=[invepsa1(1,1)  imag(invepsa1(1,2))];
+invepsb=[invepsb1(1,1)  imag(invepsb1(1,2))];
 
 end
 
-
 cell_size=a2*Na*2;
-rect_size=ddy1;
+rect_size=a2;
 
 filly=ddy1/a2;
 
@@ -781,7 +655,6 @@ for dGy=-2*nGy:2*nGy
         else
           four_coefy=(invepsa(k)-invepsb(k))*ddy1/(a2)*sin(tty)/(tty)/(2*Na);
        end
-      
        
         KapaUnit(dGyp,k)=four_coefy;
 
@@ -789,10 +662,6 @@ for dGy=-2*nGy:2*nGy
   end
 
 end
-
-
-Kapa=zeros(4*nGy+1,2)+1i*zeros(4*nGy+1,2);
-
 
 global ndef;
 global defstart;
