@@ -1,11 +1,10 @@
-function faraday
+function faraday_faster
 
 clear all
 
 colors = {'-or', '-ob', '-oc', '-ok','-*r', '-*b',...
  '-*c', '-*k','-xr', '-xb', '-xc', '-xk'};
 %C = {'k','b','r','g','y'}; % Cell array of colros.
-
 
 
 [filename1,filepath1]=uigetfile('*.txt', 'Selectinput file')
@@ -39,21 +38,24 @@ fi=numbs(1);
 line=getNewDataLine(fid);
 numbs = str2num(line);
 theta=numbs(1);
-global inc_mode;
-inc_mode=0;
-if(length(numbs)>1)
-inc_mode=numbs(2);
+
+theta2=0;
+ndivth=0;
+if(length(numbs)>2)
+theta2=numbs(2);
+ndivth=numbs(3);
 end
 
 line=getNewDataLine(fid);
 numbs = str2num(line);
-ax=numbs(1);
-ay=numbs(2);
+a1=numbs(1);
+a2=numbs(2);
 
 d1=0;
 if(length(numbs)>2)
 d1=numbs(3);
 end
+
 
 d2=d1;
 
@@ -64,27 +66,38 @@ eps3=numbs(2);
 
 line=getNewDataLine(fid);
 numbs = str2num(line);
-ndata=length(numbs)
-
+ndatab=length(numbs);
 gamab=0;
 epsbx=numbs(1);
-if(ndata>1)
+if(ndatab>1)
 epsby=numbs(2);
 epsbz=numbs(3);
 gamab=numbs(4);
 end
 
+if(ndatab>4)
+epsbx=epsbx+1i*numbs(5);
+epsby=epsby+1i*numbs(6);
+epsbz=epsbz+1i*numbs(7);
+end
+
 line=getNewDataLine(fid);
 numbs = str2num(line);
+ndataa=length(numbs);
 epsax=numbs(1);
 gamaa=0;
-if(ndata>1)
+if(ndataa>1)
 epsay=numbs(2);
 epsaz=numbs(3);
 gamaa=numbs(4);
 end
+if(ndataa>4)
+epsax=epsax+1i*numbs(5);
+epsay=epsay+1i*numbs(6);
+epsaz=epsaz+1i*numbs(7);
+end
 
-if(ndata>1)
+if(ndatab>1)
 
 epsb=[epsbx 0 -1i*gamab;0 epsby 0;1i*gamab 0 epsbz ];
 
@@ -93,6 +106,14 @@ else
 epsb=[epsbx];
 
 epsa=[epsax];
+end
+
+if(ndataa>1)
+
+disp('epsilon tensor of background');
+epsb
+disp('epsilon tensor of holes');
+epsa
 end
 
 line=getNewDataLine(fid);
@@ -134,6 +155,15 @@ Fn1=numbs(1);
 Fn2=numbs(2);
 ndiv=numbs(3);
 
+Fn0=Fn1;
+
+if(ndivth>0)
+Fn1=theta;
+Fn2=theta2;
+ndiv=ndivth;
+end
+
+
 line=getNewDataLine(fid);
 numbs = str2num(line);
 nGx=numbs(1)
@@ -163,16 +193,20 @@ for p=1:1*cf*ndiv+1
      p
      
     Fn(p)=Fn1+dFn*(p-1);
-   % theta=p;
+    
+   if(ndivth>0)
+    wn=Fn0;
+    theta=Fn(p);
+  else
+     wn=Fn(p);
+    end
 
-    wn=Fn(p);
-    k1=sqrt(eps1)*2*pi*wn/ay;
+    k1=sqrt(eps1)*2*pi*wn/a1;
      Fr_hom(p)=-180*gamab/sqrt(epsbx)*Na*wn;
 
-     Fn(p)=Fn1+dFn*(p-1);
      pp=p;
-    %  Fn(p)=theta;
-    [Ts Rs,Fr, Tsx]=calculteFaraday(geometry,epsa,epsb,eps1,eps3,ax,ay,Rx,Ry,d1,d2,Na,nGx,nGy,k1,pp,plotFT,plotWave,colR,theta,fi,rec);
+
+    [Ts Rs,Fr, Tsx]=calculteFaraday(geometry,epsa,epsb,eps1,eps3,a1,a2,Rx,Ry,d1,d2,Na,nGx,nGy,k1,pp,plotFT,plotWave,colR,theta,fi,rec);
            
       if(real(Ts)>1) 
       %  Ts=1;
@@ -204,6 +238,7 @@ fprintf(fid,'[nGx *  nGy]\n');
 fprintf(fid,'%d\t%d\n',nGx,nGy);
 fprintf(fid,'[Fn *  Rotation * Transmitance ]\n');  
 
+
   for p=1:1*cf*ndiv+1
   
   result(p,1)= Fn(p);
@@ -228,9 +263,9 @@ if(rotation &&length(FR)>1)
                 figure(1)
              plot(Fn,FR,colR);
              
-              axis([Fn1,Fn2,0,1.1*max(FR)]);
+            %  axis([Fn1,Fn2,-90,0]);
 
-            % axis([Fn1,Fn2,-90,90]);
+             axis([Fn1,Fn2,-90,90]);
              hold on
              
          %  plot(Fn,Fr_hom,'+k');
@@ -254,7 +289,11 @@ end
 function [Ts Rs Fr Tsx]=calculteFaraday(geometry,epsa,epsb,eps1,eps3,a1,a2,...
 Rx,Ry,d1,d2,Na,nGx,nGy,k1,p,plotFT,plotWave,colorAng,theta,fi,rec)
 
-nk=size(epsb,2);
+dmm=size(epsb,2);
+nk=1;
+if(dmm>1)
+nk=2;
+end
 
 single_percision=1; % using single or double percison numbers
 
@@ -282,7 +321,7 @@ numG=(Lx1)*nGy;
 dd=Lx1;
 
 
-E0=[0 0 1]';
+E0=[0 1]';
 if(nk==1)
 E0=[1]';
 end;
@@ -306,14 +345,14 @@ if(p==1)
         FillKapaTriang(nGx,nGy,epsa,epsb,L,R,Na,a1,a2);  %triangular
         %lattivce not implemented properly.
     elseif (geometry==0)
-        FillKapaCylinderAntiSymDef(nGx,nGy,epsa,epsb,L,Rx,Ry,Na,a1,a2,d1,fi); 
+        KapaCylinderBessel(nGx,nGy,epsa,epsb,L,Rx,Ry,Na,a1,a2,d1,fi); 
 
     else
     if(geometry==1 && rec==1)
-    FillKapaRectangleAntiSym(nGx,nGy,epsa,epsb,L,Rx,Ry,Na,a1,a2,d1,fi);
+   KapaRectangle(nGx,nGy,epsa,epsb,L,Rx,Ry,Na,a1,a2,d1,fi);
 
   else
-       FillKapaAntiSymNum(geometry,nGx,nGy,epsa,epsb,L,Rx,Ry,Na,a1,a2,d1,fi);
+      KapaAntiNum(geometry,nGx,nGy,epsa,epsb,L,Rx,Ry,Na,a1,a2,d1,fi);
  end
  end
 
@@ -416,12 +455,12 @@ if(p==1)
                     Kapas(1:4)=Kapa(dGxp,sGyp,1:4);                                       
                     Kapad(1:4)=Kapa(dGxp,dGyp,1:4);
                     
-                    KapTenss=[Kapas(1) 0 1i*Kapas(4); 0 Kapas(2) 0 ;
-                        -1i*Kapas(4) 0  Kapas(3)];
+                    KapTenss=[Kapas(1) 1i*Kapas(4); 
+                        -1i*Kapas(4)  Kapas(3)];
 
                     
-                    KapTensd=[Kapad(1) 0 1i*Kapad(4); 0 Kapad(2) 0 ;
-                        -1i*Kapad(4) 0  Kapad(3)];
+                    KapTensd=[Kapad(1) 1i*Kapad(4);
+                        -1i*Kapad(4) Kapad(3)];
                     end
                     
                     W=zeros(nk,nk);
@@ -431,20 +470,12 @@ if(p==1)
                     else
                     
                     W(1,1)=kym^2;
-                    W(1,2)=-kxn1*kym;
-                    W(2,1)= W(1,2);
-                    W(2,2)=kxn2;
-                    
-                    W(3,3)=W(1,1)+ W(2,2);
+                    W(2,2)=kym^2+kxn2;; 
                     
                     end
         
                     
                     Wm=W;
-                     if(nk==3)
-                     Wm(1,2)= -W(1,2);
-                     Wm(2,1)= -W(2,1);
-                     end
 
                     CA=(KapTensd*W-KapTenss*Wm);
                    
@@ -454,7 +485,6 @@ if(p==1)
                       WR(1,1)=kxn2*pph/Gy1;
                      else
                       WR(2,2)=kxn2*pph/Gy1;
-                      WR(3,3)=WR(2,2);
                      end
 
 
@@ -510,26 +540,17 @@ if(p==1)
                 
                 
                 if(Gx==Gx1)
-                    for k=1:nk
-                        if(k~=2)
-                            
-                            MM((Gx1p+numG-1)*nk+k,((Gx1p-1)*nGy+Gy-1)*nk+k)=pi*Gy;
-
-                        end
-                         
+                    for k=1:nk                          
+                            MM((Gx1p+numG-1)*nk+k,((Gx1p-1)*nGy+Gy-1)*nk+k)=pi*Gy;                         
                     end
                     
                     if(mod(Gy,2)==0)
                         for k=1:nk
-                            if(k~=2)
                                 MM((Gx1pp+numG-1)*nk+k,((Gx1p-1)*nGy+Gy-1)*nk+k)=pi*Gy;
-                            end
                         end
                     else
                         for k=1:nk
-                            if(k~=2)
                                 MM((Gx1pp+numG-1)*nk+k,((Gx1p-1)*nGy+Gy-1)*nk+k)=-pi*Gy;
-                            end
                         end
                     end
                     
@@ -634,8 +655,6 @@ for Gx=-nGx:nGx
     
     for k=1:nk
         
-       
-            if(k~=2)
                 NN((numG+Gxp-1)*nk+k,(numG+Gxp-1)*nk+k)=1;
                 
                 
@@ -645,23 +664,16 @@ for Gx=-nGx:nGx
                 NN((numG+Gxpp-1)*nk+k,(numG+Gxp-1)*nk+k)=-(1i*L*ktny-1);
                 
                 NN((numG+Gxpp-1)*nk+k,(numG+Gxpp-1)*nk+k)=-1;
-            else
-                
-                NN((numG+Gxp-1)*nk+k,(numG+Gxp-1)*nk+k)=1.;
-            
-                NN((numG+Gxpp-1)*nk+k,(numG+Gxpp-1)*nk+k)=1.;
-            end
         
         if(Gx==0)
                       
-            if(k~=2)
              bN((numG+Gxp-1)*nk+k)= (1i*L*k1y+1)*E0(k);
              if(k==1 && nk~=1)
               bN((numG+Gxpp-1)*nk+k)=-E0(k);
               else
               bN((numG+Gxpp-1)*nk+k)=E0(k);
             end
-            end
+
         end
     end
 end
@@ -683,16 +695,7 @@ else
  x=linsolve(NN,bN);
  end
 
- if(nk==3)
-%% x2=zeros(dimx/3,1);
-%% 
-%%for j=1:dimx/3   
-%%    x2(j)=x(3*j);
-%%end
-%%x2
-else
-%x
-end
+
 Anm=zeros(2*nGx+1,nGy,nk);
 Tn=zeros(2*nGx+1,nk);
 Tn2=zeros(2*nGx+1,1);
@@ -727,7 +730,7 @@ for Gx=-nGx:nGx
         
         Rn(k+1,j)=x(kpp+k*nk+j);
         
-        if(j==1)
+        if(j==1 && nk>1)
          Tn2x(k+1)= Tn2x(k+1)+Tn(k+1,j)*conj(Tn(k+1,j));
         end
         Tn2(k+1)= Tn2(k+1)+Tn(k+1,j)*conj(Tn(k+1,j));
@@ -744,6 +747,8 @@ Tsx=0;
 
 Rs=0;
 
+Ts0=0;
+Tsx0=0;
 for Gx=-nGx:nGx
     k=nGx+1+Gx;
     kxn1=1*kx+Gx*bx;
@@ -767,41 +772,20 @@ for Gx=-nGx:nGx
         %Ts=Ts+ktny/k3*sqrt(eps3/eps1)*abs(Tn(k,3))^2/cos(thetad);
     Tsx=Tsx+ktny/k3*sqrt(eps3/eps1)*Tn2x(k)/cosd(theta);
 
+    if(Gx==0)
+        Ts0=ktny/k3*sqrt(eps3/eps1)*Tn2(k)/cosd(theta);
+        Tsx0=ktny/k3*sqrt(eps3/eps1)*Tn2x(k)/cosd(theta);
+    end
     
     Rs=Rs+abs(krny)/k1*Rn2(k)/cosd(theta);
 end
 
-%E02=(1+Rn(nGx+1))*conj(1+Rn(nGx+1));
-%Ts=Tn2(nGx+1)/E02;
-
-Fr=0;
-
-if(nk>1)
-
-nL=max(int32(L*k1/2/pi)*17*2,35);
-
-
-
-yy=linspace(0,L,nL);
-
-
-if(plotWave)
 
 Nx=1;
+nL=200;
+yy=linspace(0,L,nL);
+Ez=zeros(nL);
 
-if(Nx==1)
-    xx=zeros(1,1);
-else
-    xx=linspace(-a1/2,a1/2,Nx);
-end
-
-phi=zeros(Nx,nL,nk);
-psi=zeros(Nx,nL,nk);
-
-for ix=1:Nx
-    
-    x=xx(ix);
-    
     for k=1:nL
         y=yy(k);
         
@@ -816,137 +800,38 @@ for ix=1:Nx
             del=0;
             end
             for Gy=1:nGy
-                for j=1:nk
+
+                  
+                  
 
 		 ky0=Gy*by;
        
-                    psi(ix,k,j)=psi(ix,k,j)+Anm(Gxp,Gy,j)*sin(ky0*y)*exp(1i*kxn*x);
-                end
+                    Ez(k)=Ez(k)+Anm(Gxp,Gy,1)*sin(ky0*y);
             end
-            for j=1:nk
-                phi(ix,k,j)=phi(ix,k,j)+y/L*Tn(Gxp,j)*exp(1i*kxn*x)+(1-y/L)*(Rn(Gxp,j)+del*E0(j))*exp(1i*kxn*x);
-            end
+
         end
         
     end
-end
-
-
-E1=phi+psi;
-
-E2=abs(E1);
-E2(:,:,1);
-
-%writeMeshAndField(Nx,nL,1,E2,2,Na);
-
-
-    figure(5)
     
-    set(gca,'DataAspectRatio',[1 1 1]);
-    axis([-2 2 0 L -2 2]);
-    az = 40;
-    el = 30;
-    %  az=90;
-    %  el=0;
-    view(az, el);
-    
-    
-    
-    hold on
-    
-    for ix=1:Nx
-        x=xx(ix);
-        Vx=E2(ix,1,1);
-        Vy=E2(ix,1,2);
-        Vz=E2(ix,1,3);
-        
-        
-        for k=1:nL
-            
-            y=yy(k);
-            Vxp=Vx;
-            Vx=E2(ix,k,1);
-            
-            Vyp=Vy;
-            Vy=E2(ix,k,2);
-            
-            Vzp=Vz;
-            Vz=E2(ix,k,3);
-            
-            
-            color = 'r';
-            
-            
-            if(k>1)
-                h1(k)=plot3([Vxp+x Vx+x],[Vyp+yy(k-1) Vy+y],[Vzp Vz],'LineWidth',2,'Color','b');
-                h2(k)= plot3([-Vxp+x -Vx+x],[yy(k-1) y],[-Vzp -Vz],'LineWidth',2,'Color','b');
-                h3= plot3([0 0],[0 L],[0 0],'LineWidth',2,'Color','k');
-                
-                
-            end
-            
-            
-            arrow1(k) = arrow3d([x x+Vx],[y y+Vy],[0 Vz],.92,.01,.02,color);
-            arrow1(k) = arrow3d([x x-Vx],[y y-Vy],[0 -Vz],.92,.01,.02,color);
-            
-            
-            
-        end
-        
-    end;
-end
 
+Fr=0;
 
-Nx=10;
+if(nk>1)
 
-if(Nx==1)
-    xx=zeros(1,1);
-else
-    xx=linspace(-a1/2,a1/2,Nx);
-end
-
-E3=zeros(Nx,nk);
-E1=zeros(Nx,nk);
-
-for ix=1:Nx
-    
-    E1(ix,:)=E0(:);
-    
-    x=xx(ix);
-    
-        
-        for Gx=-nGx:nGx
-            
-            kxn=1*kx+Gx*bx;
-            
-            Gxp=nGx+1+Gx;
-           
-            for j=1:nk
-                E3(ix,j)=E3(ix,j)+Tn(Gxp,j)*exp(1i*kxn*x);
-                 E1(ix,j)=E1(ix,j)+Rn(Gxp,j)*exp(1i*kxn*x);
-            end
-        end
-
-end
-
-Ex1_sum=sum(E1(:,1));
-Ez1_sum=sum(E1(:,3));
-TM_fract1=abs(Ex1_sum)^2/(abs(Ex1_sum)^2+abs(Ez1_sum)^2);
-ct1=sqrt(TM_fract1);
-angle0=-acos(ct1);
- Ex3_sum=sum(E3(:,1));
-Ez3_sum=sum(E3(:,3));
-
-TM_fract=abs(Ex3_sum)^2/(abs(Ex3_sum)^2+abs(Ez3_sum)^2);
    
-ct=sqrt(TM_fract);
-   
- angle=-acos(ct);
+% TM_fract=abs(Tsx0/Ts0);
+%ct=sqrt(TM_fract);
 
-Fr=90+(angle)*180/pi;
-Fr0=90+(angle0)*180/pi;
+%angle=asin(ct);
 
-%%%%Fr=(Fr-Fr0);
+angle=atand(abs(Tn(nGx+1,1))/abs(Tn(nGx+1,nk)));
+
+if(real(Tn(nGx+1,1))/real(Tn(nGx+1,nk))<0) 
+angle=-angle;
+end;
+
+Fr=angle;
+
 
 if(plotWave)
     
@@ -965,12 +850,12 @@ end
 end
 
 
-function FillKapaCylinderAntiSymDef(nGx,nGy,epsa,epsb,L,Rx,Ry,Na,a1,a2,d1,fi)
+function KapaCylinderBessel(nGx,nGy,epsa,epsb,L,Rx,Ry,Na,a1,a2,d1,fi)
 global Kapa;
 
 global fext;
 
-disp('anti-sym Defect');
+disp(' Calculating Fourier coeficients by Bessel functions');
 fext
 nk=4;
 if(length(epsa)==1)
@@ -1272,10 +1157,10 @@ end
 
 
 
-function FillKapaRectangleAntiSym(nGx,nGy,epsa,epsb,L,Rx,Ry,Na,a1,a2,d1,fi)
+function KapaRectangle(nGx,nGy,epsa,epsb,L,Rx,Ry,Na,a1,a2,d1,fi)
 global Kapa;
 
-disp('rectangle anti-sym');
+disp('rectangular holes');
 nk=4;
 if(length(epsa)==1)
 nk=1;
@@ -1622,7 +1507,7 @@ light('Color','r')
 end
 
 
-function FillKapaAntiSymNum(geometry,nGx,nGy,epsa,epsb,L,Rx,Ry,Na,a1,a2,d1,fi)
+function KapaAntiNum(geometry,nGx,nGy,epsa,epsb,L,Rx,Ry,Na,a1,a2,d1,fi)
 
 global fext;
 
