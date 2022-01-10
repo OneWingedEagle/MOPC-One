@@ -16,7 +16,7 @@ line=getNewDataLine(fid);
 numbs = str2num(line);
 geometry=numbs(1);
 global fext;
-rec=1;
+rec=0;
 fext=1;
 
 
@@ -25,7 +25,7 @@ if(numbs(2)>0);
 rec=1;
 end
 end
-rec=1;
+rec=0;
 line=getNewDataLine(fid);
 numbs = str2num(line);
 Rx=numbs(1);
@@ -359,31 +359,7 @@ if(p==1)
  
    if(plotFT)
         
-       if(nGx==0)
-       ndy=40*Na;
         
-        y=linspace(-L,L,ndy);
-        Kapar=zeros(ndy);       
-
-            for iy=1:ndy
-
-                y1=y(iy);
-                tt=0;
-                    for m=-nGy:nGy
-                        Gm=by*m;
-                        TT=Kapa(2*nGx+1,m+2*nGy+1,plotFT);
-                        
-                        tt=tt+TT*exp(1i*(Gm*y1));
-                    end
-
-                Kapar(iy)=real(tt);
-            end
-   
-
-        figure(4);
-
-        plot(y,Kapar);
-     else 
         ndx=30;
  	      ndy=40*Na;
         
@@ -427,9 +403,8 @@ if(p==1)
         axis equal;
         set(gca,'DataAspectRatio',[1 1 .05]);
 %        return;
-        end
     end
-XX=Kapa(:,:,1);
+
     disp('Computing matrix, step 1...');
     
     dimx=nk*(numG+2*(Lx1));
@@ -541,7 +516,8 @@ XX=Kapa(:,:,1);
                     
                     
                 end
-
+                
+                
                 
                 if(Gx1==0)
                     v=CE*E0;
@@ -556,11 +532,12 @@ XX=Kapa(:,:,1);
                     for k=1:nk
                         
                         MM((countG-1)*nk+j,(numG+Gx1p-1)*nk+k)=-CT(j,k);
-                        MM((countG-1)*nk+j,(numG+Lx1+Gx1p-1)*nk+k)=-CR(j,k);
+                        MM((countG-1)*nk+j,(numG+dd+Gx1p-1)*nk+k)=-CR(j,k);
                         
                     end
                 end
-
+                
+                
                 
                 if(Gx==Gx1)
                     for k=1:nk                          
@@ -589,7 +566,7 @@ XX=Kapa(:,:,1);
     
 end
 
-MM;
+
 bN=zeros(nk*(numG+2*(Lx1)),1);
 
 disp('Computing matrix, step 2...');
@@ -641,7 +618,8 @@ for Gx=-nGx:nGx
                 NN((countG-1)*nk+k,(numG+Gxpp-1)*nk+k)=pph/Gy*w2c2;
       
             if(Gx==0)
-                 bN((countG-1)*nk+k)=-pph/Gy*w2c2*E0(k);
+                
+                bN((countG-1)*nk+k)=-pph/Gy*w2c2*E0(k);
                 
             end
         end
@@ -700,15 +678,13 @@ for Gx=-nGx:nGx
     end
 end
 
-NN;
-
 bN=bN+bE;
 
 disp('solving matrix...');
 
-bN;
+
   NN=NN+MM;   
-NN;
+
 gpu=0;
 
 if(gpu>0)
@@ -1199,8 +1175,8 @@ invepsa=[invepsa1(1,1)];
 invepsb=[invepsb1(1,1)];
 
 else
-invepsa=[invepsa1(1,1)  invepsa1(2,2) invepsa1(3,3) imag(invepsa1(1,3))]
-invepsb=[invepsb1(1,1) invepsb1(2,2) invepsb1(3,3)  imag(invepsb1(1,3))]
+invepsa=[invepsa1(1,1)  invepsa1(2,2) invepsa1(3,3) imag(invepsa1(1,3))];
+invepsb=[invepsb1(1,1) invepsb1(2,2) invepsb1(3,3)  imag(invepsb1(1,3))];
 
 end
 
@@ -1216,7 +1192,7 @@ by=pi/L;
 
 KapaUnit=zeros(1,4*nGy+1,4)+1i*zeros(1,4*nGy+1,4);
 
-nGx
+
 
 for dGx=-2*nGx:2*nGx
       dGxp=dGx+1+2*nGx;
@@ -1226,10 +1202,10 @@ for dGx=-2*nGx:2*nGx
         tty=dGy*by*Ry;
      
         dGyp=dGy+1+2*nGy;
-  
+        
   for k=1:nk
       if(dGx==0)
-       four_coefx= 1;%(invepsb(k)+fillx*(invepsa(k)-invepsb(k)));
+       four_coefx= (invepsb(k)+fillx*(invepsa(k)-invepsb(k)));
         else
           four_coefx=(invepsa(k)-invepsb(k))*2*Rx/(a1)*sin(ttx)/(ttx);
        end
@@ -1237,9 +1213,10 @@ for dGx=-2*nGx:2*nGx
          if(dGy==0)
        four_coefy= (invepsb(k)+filly*(invepsa(k)-invepsb(k)))/(2*Na);
         else
-          four_coefy=(invepsa(k)-invepsb(k))*2*Ry/(a2)*sin(tty)/(tty)/(2*Na);
+          four_coefy=(invepsa(k)-invepsb(k))*2*Ry/(a1)*sin(tty)/(tty)/(2*Na);
        end
-
+      
+       
         KapaUnit(dGxp,dGyp,k)=four_coefx*four_coefy;
 
 
@@ -1248,6 +1225,9 @@ for dGx=-2*nGx:2*nGx
 end
 
 end
+
+Kapa=zeros(4*nGx+1,4*nGy+1,4)+1i*zeros(4*nGx+1,4*nGy+1,4);
+
 
 global ndef;
 global defstart;
@@ -1298,7 +1278,7 @@ for n=0:Na-1
  end
 end
 
- dGxp0=1+2*nGx;
+ dGxp=1+2*nGx;
 
 
 by=pi/L;
@@ -1313,11 +1293,19 @@ for n=-Na:Na-1
      if(isDef(np,1))
 
     for k=1:nk
-       Kapa(dGxp0,dGyp,k)=  Kapa(dGxp0,dGyp,k)+KapaDefect(1,dGyp,k)*twindle;
+       if(k~=4 || n>=0)
+       Kapa(dGxp,dGyp,k)=  Kapa(dGxp,dGyp,k)+KapaDefect(1,dGyp,k)*twindle;
+        else
+       Kapa(dGxp,dGyp,k)=  Kapa(dGxp,dGyp,k)+KapaDefect(1,dGyp,k)*twindle;
+        end
      end
    else
      for k=1:nk
+       if(k~=4 || n>=0)
          Kapa(:,dGyp,k)=Kapa(:,dGyp,k)+KapaUnit(:,dGyp,k)*twindle;
+        else
+         Kapa(:,dGyp,k)=Kapa(:,dGyp,k)+KapaUnit(:,dGyp,k)*twindle;
+        end
      end
    
    end
@@ -1325,7 +1313,7 @@ for n=-Na:Na-1
         
     end
   end
-
+  
 end
 
 
